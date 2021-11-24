@@ -5,11 +5,12 @@ const {ExitCode} = require(`../../const`);
 const fs = require(`fs`);
 
 const DEFAULT_COUNT = 1;
-const FILE_NAME = `mocks.json`;
+const MOCKS_FILE_NAME = `mocks.json`;
 const MAX_ANNOUNCE_SENTENCES = 5;
 const MAX_FULL_TEXT_SENTENCES = 10;
 const MAX_CATEGORIES = 3;
 const MAX_DAYS_PERIOD = 90;
+const MAX_RECORDS = 1000;
 
 const TITLES = [
   `Ёлки. История деревьев`,
@@ -102,14 +103,14 @@ module.exports = {
     const [param] = args;
     const count = Number.parseInt(param, 10) || DEFAULT_COUNT;
 
-    if (count > 1000) {
-      console.info(`Не больше 1000 публикаций`);
+    if (count > MAX_RECORDS) {
+      console.info(`Operation failed. Not more than 1000 records allowed.`);
       process.exit(ExitCode.error);
     }
 
     const content = JSON.stringify(generateMocks(count));
 
-    fs.writeFile(FILE_NAME, content, (err) => {
+    fs.writeFile(MOCKS_FILE_NAME, content, (err) => {
       if (err) {
         return console.error(`Can't write data to file...`);
       }
