@@ -104,7 +104,9 @@ module.exports = {
     const count = Number.parseInt(param, 10) || DEFAULT_COUNT;
 
     if (count > MAX_RECORDS) {
-      console.info(`Operation failed. Not more than 1000 records allowed.`);
+      console.info(
+          `Operation failed. Not more than ${MAX_RECORDS} records allowed.`,
+      );
       process.exit(ExitCode.error);
     }
 
