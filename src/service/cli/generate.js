@@ -1,8 +1,9 @@
 'use strict';
 
-const {getRandomInt, shuffle} = require(`../../utils`);
+const fs = require(`fs`).promises;
+const chalk = require(`chalk`);
 const {ExitCode} = require(`../../const`);
-const fs = require(`fs`);
+const {getRandomInt, shuffle} = require(`../../utils`);
 
 const DEFAULT_COUNT = 1;
 const MOCKS_FILE_NAME = `mocks.json`;
@@ -99,25 +100,24 @@ const generateMocks = (count) =>
 
 module.exports = {
   name: `--generate`,
-  run(args) {
+  async run(args) {
     const [param] = args;
     const count = Number.parseInt(param, 10) || DEFAULT_COUNT;
 
     if (count > MAX_RECORDS) {
-      console.info(
+      console.info(chalk.red(
           `Operation failed. Not more than ${MAX_RECORDS} records allowed.`,
-      );
+      ));
       process.exit(ExitCode.error);
     }
 
     const content = JSON.stringify(generateMocks(count));
 
-    fs.writeFile(MOCKS_FILE_NAME, content, (err) => {
-      if (err) {
-        return console.error(`Can't write data to file...`);
-      }
-
-      return console.info(`Operation success. File created.`);
-    });
-  },
+    try {
+      await fs.writeFile(MOCKS_FILE_NAME, content);
+      console.info(chalk.green(`Operation success. File created.`));
+    } catch (err) {
+      console.error(chalk.red(`Can't write data to file...`));
+    }
+  }
 };
