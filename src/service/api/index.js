@@ -1,9 +1,10 @@
 'use strict';
 
 const {Router} = require(`express`);
-const {CategoryService} = require(`../data-service`);
+const {CategoryService, ArticlesService} = require(`../data-service`);
 const getMockData = require(`../lib/get-mock-data`);
 const registerCategoryRoutes = require(`./category`);
+const registerArticlesRoutes = require(`./article`);
 
 const apiRouter = new Router();
 
@@ -11,6 +12,7 @@ const apiRouter = new Router();
   const mockData = await getMockData();
 
   registerCategoryRoutes(apiRouter, new CategoryService(mockData));
+  registerArticlesRoutes(apiRouter, new ArticlesService(mockData));
 })();
 
 module.exports = apiRouter;
