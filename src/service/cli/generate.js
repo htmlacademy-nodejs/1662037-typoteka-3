@@ -2,12 +2,14 @@
 
 const fs = require(`fs`).promises;
 const chalk = require(`chalk`);
+const {nanoid} = require(`nanoid`);
 const {ExitCode} = require(`../../const`);
 const {getRandomInt, shuffle} = require(`../../utils`);
 
 const FILE_SENTENCES_PATH = `./data/sentences.txt`;
 const FILE_TITLES_PATH = `./data/titles.txt`;
 const FILE_CATEGORIES_PATH = `./data/categories.txt`;
+const FILE_COMMENTS_PATH = `./data/comments.txt`;
 const DEFAULT_COUNT = 1;
 const MOCKS_FILE_NAME = `mocks.json`;
 const MAX_ANNOUNCE_SENTENCES = 5;
@@ -15,6 +17,9 @@ const MAX_FULL_TEXT_SENTENCES = 10;
 const MAX_CATEGORIES = 3;
 const MAX_DAYS_PERIOD = 90;
 const MAX_RECORDS = 1000;
+const MAX_ID_LENGTH = 6;
+const MAX_COMMENTS_COUNT = 3;
+const MAX_COMMENT_SENTENCES = 3;
 
 const readFile = async (filePath) => {
   try {
@@ -33,21 +38,29 @@ const getRandomDate = () => {
   );
 };
 
-const generateMocks = (count, sentences, titles, categories) =>
+const generateComments = (comments) =>
+  Array(getRandomInt(0, MAX_COMMENTS_COUNT))
+    .fill({})
+    .map(() => ({
+      id: nanoid(MAX_ID_LENGTH),
+      text: shuffle(comments).slice(0, getRandomInt(1, MAX_COMMENT_SENTENCES)).join(` `),
+    }));
+
+const generateMocks = (count, sentences, titles, categories, comments) =>
   Array(count)
     .fill({})
     .map(() => ({
+      id: nanoid(MAX_ID_LENGTH),
       title: titles[getRandomInt(0, titles.length - 1)],
       createdDate: getRandomDate(),
-      announce: shuffle(sentences).slice(
-          0,
-          getRandomInt(1, MAX_ANNOUNCE_SENTENCES),
-      ),
-      fullText: shuffle(sentences).slice(
-          0,
-          getRandomInt(MAX_ANNOUNCE_SENTENCES, MAX_FULL_TEXT_SENTENCES),
-      ),
+      announce: shuffle(sentences)
+        .slice(0, getRandomInt(1, MAX_ANNOUNCE_SENTENCES))
+        .join(` `),
+      fullText: shuffle(sentences)
+        .slice(0, getRandomInt(MAX_ANNOUNCE_SENTENCES, MAX_FULL_TEXT_SENTENCES))
+        .join(` `),
       category: shuffle(categories).slice(0, getRandomInt(1, MAX_CATEGORIES)),
+      comments: generateComments(comments),
     }));
 
 module.exports = {
@@ -58,6 +71,7 @@ module.exports = {
     const sentences = await readFile(FILE_SENTENCES_PATH);
     const titles = await readFile(FILE_TITLES_PATH);
     const categories = await readFile(FILE_CATEGORIES_PATH);
+    const comments = await readFile(FILE_COMMENTS_PATH);
 
     if (count > MAX_RECORDS) {
       console.info(
@@ -69,7 +83,7 @@ module.exports = {
     }
 
     const content = JSON.stringify(
-        generateMocks(count, sentences, titles, categories),
+        generateMocks(count, sentences, titles, categories, comments),
     );
 
     try {
