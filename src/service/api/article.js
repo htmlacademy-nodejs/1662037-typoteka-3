@@ -29,7 +29,7 @@ module.exports = (app, service) => {
     return res.status(HttpCode.CREATED).json(newArticle);
   });
 
-  router.put(`/:articleId`, checkArticleExistance(service), async (req, res) => {
+  router.put(`/:articleId`, [checkArticleExistance(service), validateArticle], async (req, res) => {
     const oldArticle = res.locals.article;
     const newArticle = req.body;
 
