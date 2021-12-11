@@ -1,6 +1,6 @@
 'use strict';
 
-const { HttpCode } = require(`../../const`);
+const {HttpCode} = require(`../../const`);
 
 module.exports = (req, res, next) => {
   const newArticle = req.body;
