@@ -7,15 +7,10 @@ class SearchService {
 
   async find(query) {
     const regex = new RegExp(`${query}`);
-    let result = [];
 
-    this._articles.forEach((item) => regex.test(item.title) && result.push(item));
+    const result = this._articles.filter((item) => regex.test(item.title));
 
-    if (result.length === 0) {
-      return null;
-    }
-
-    return result;
+    return (result.length === 0) ? null : result;
   }
 }
 
