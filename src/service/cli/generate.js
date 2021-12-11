@@ -3,7 +3,7 @@
 const fs = require(`fs`).promises;
 const chalk = require(`chalk`);
 const {nanoid} = require(`nanoid`);
-const {ExitCode} = require(`../../const`);
+const {ExitCode, MAX_ID_LENGTH} = require(`../../const`);
 const {getRandomInt, shuffle} = require(`../../utils`);
 
 const FILE_SENTENCES_PATH = `./data/sentences.txt`;
@@ -17,7 +17,6 @@ const MAX_FULL_TEXT_SENTENCES = 10;
 const MAX_CATEGORIES = 3;
 const MAX_DAYS_PERIOD = 90;
 const MAX_RECORDS = 1000;
-const MAX_ID_LENGTH = 6;
 const MAX_COMMENTS_COUNT = 3;
 const MAX_COMMENT_SENTENCES = 3;
 
