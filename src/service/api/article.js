@@ -63,7 +63,7 @@ module.exports = (app, service) => {
         const deletedComment = await service.deleteComment(article, commentId);
 
         if (!deletedComment) {
-          res.status(HttpCode.NOT_FOUND).send(`Comment with id ${commentId} not found`);
+          return res.status(HttpCode.NOT_FOUND).send(`Comment with id ${commentId} not found`);
         }
 
         return res.status(HttpCode.OK).json(`Comment with id ${deletedComment.id} has been deleted`);

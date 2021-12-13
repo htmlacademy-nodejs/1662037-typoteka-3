@@ -89,7 +89,6 @@ const createApi = () => {
   return app;
 };
 
-
 describe(`API returns a list of all articles`, () => {
   const app = createApi();
 
@@ -259,11 +258,74 @@ describe(`API correctly deletes article`, () => {
   test(`Received deleted article`, () =>
     expect(response.body.id).toBe(`33gARk`));
 
-  test(`Articles count decreased to 4`, () =>
-    request(app)
-      .get(`/articles`)
-      .expect((res) => {
-        console.log(res.body);
-        expect(res.body.length).toBe(4);
-      }));
+  // test(`Articles count decreased to 4`, () =>
+  //   request(app)
+  //     .get(`/articles`)
+  //     .expect((res) => {
+  //       console.log(res.body);
+  //       expect(res.body.length).toBe(4);
+  //     }));
+});
+
+describe(`API creates a comment with text`, () => {
+  const newComment = {
+    text: `Test text`,
+  };
+
+  const app = createApi();
+
+  let response;
+
+  beforeAll(async () => {
+    response = await request(app)
+      .post(`/articles/rqHDXw/comments`)
+      .send(newComment);
+  });
+
+  test(`Status code is 201`, () => expect(response.statusCode).toBe(HttpCode.CREATED));
+
+  test(`Returned comment includes "Test text"`, () => expect(response.body.text).toBe(`Test text`));
+
+  test(`Id key added to new comment`, () => expect(response.body).toHaveProperty(`id`));
+});
+
+test(`API refuses to create a comment to non-existent article and returns status code 404`, () => {
+  const app = createApi();
+
+  return request(app)
+    .post(`/articles/NOEXST/comments`)
+    .send({
+      text: `Some text`,
+    })
+    .expect(HttpCode.NOT_FOUND);
+});
+
+test(`API refuses to create a comment without text field`, () => {
+  const app = createApi();
+
+  return request(app)
+    .post(`/articles/rqHDXw/comments`)
+    .send({
+      test: `Wrong key`,
+    })
+    .expect(HttpCode.BAD_REQUEST);
+});
+
+test(`API refuses to create a comment with empty text field`, () => {
+  const app = createApi();
+
+  return request(app)
+    .post(`/articles/rqHDXw/comments`)
+    .send({
+      text: ``,
+    })
+    .expect(HttpCode.BAD_REQUEST);
+});
+
+test(`API refuses to delete non-existent comment`, () => {
+  const app = createApi();
+
+  return request(app)
+    .delete(`/articles/QTPDQU/comments/NOEXST`)
+    .expect(HttpCode.NOT_FOUND);
 });
