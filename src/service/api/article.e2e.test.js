@@ -2,6 +2,7 @@
 
 const express = require(`express`);
 const request = require(`supertest`);
+const cloneDeep = require(`lodash/cloneDeep`);
 
 const article = require(`./article`);
 const DataService = require(`../data-service/article`);
@@ -81,12 +82,13 @@ const mockData = [
 
 const createApi = () => {
   const app = express();
-  const cloneData = JSON.parse(JSON.stringify(mockData));
+  const cloneData = cloneDeep(mockData);
 
   app.use(express.json());
   article(app, new DataService(cloneData));
   return app;
 };
+
 
 describe(`API returns a list of all articles`, () => {
   const app = createApi();
@@ -171,7 +173,10 @@ describe(`API refuses to create an article if data is invalid`, () => {
       const corruptedArticle = {...newArticle};
       delete corruptedArticle[key];
 
-      await request(app).post(`/articles`).send(corruptedArticle).expect(HttpCode.BAD_REQUEST);
+      await request(app)
+        .post(`/articles`)
+        .send(corruptedArticle)
+        .expect(HttpCode.BAD_REQUEST);
     }
   });
 });
@@ -193,9 +198,11 @@ describe(`API changes article content by received data`, () => {
     response = await request(app).put(`/articles/QTPDQU`).send(newArticle);
   });
 
-  test(`Status code is 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
+  test(`Status code is 200`, () =>
+    expect(response.statusCode).toBe(HttpCode.OK));
 
-  test(`Returns changed article`, () => expect(response.body).toEqual(expect.objectContaining(newArticle)));
+  test(`Returns changed article`, () =>
+    expect(response.body).toEqual(expect.objectContaining(newArticle)));
 
   test(`Article is really changed in articles list`, () =>
     request(app)
@@ -203,4 +210,60 @@ describe(`API changes article content by received data`, () => {
       .expect((res) =>
         expect(res.body).toEqual(expect.objectContaining(newArticle)),
       ));
+});
+
+test(`API returns status code 404 when trying to change non-existing article`, () => {
+  const newArticle = {
+    title: `Test`,
+    createdDate: `2021-10-28T14:37:32.409Z`,
+    announce: `You can achieve something`,
+    fullText: `Так ли это на самом деле? Лучше турбированных двигателей еще ничего не придумали. Этот смартфон — настоящая находка. Стоит только немного постараться и запастись книгами. Игры и программирование разные вещи. Альбом стал настоящим открытием года. Большой и яркий экран мощнейший процессор — всё это в небольшом гаджете. Золотое сечение — соотношение двух величин, гармоническая пропорция.`,
+    category: [`Test`],
+  };
+
+  const app = createApi();
+
+  return request(app)
+    .put(`/articles/NOEXST`)
+    .send(newArticle)
+    .expect(HttpCode.NOT_FOUND);
+});
+
+test(`API returns status code 400 when trying to change article with invalid data`, () => {
+  const newArticle = {
+    title: `Test`,
+    createdDate: `2021-10-28T14:37:32.409Z`,
+    announce: `You can achieve something`,
+    category: [`Test`],
+  };
+
+  const app = createApi();
+
+  return request(app)
+    .put(`/articles/QTPDQU`)
+    .send(newArticle)
+    .expect(HttpCode.BAD_REQUEST);
+});
+
+describe(`API correctly deletes article`, () => {
+  const app = createApi();
+
+  let response;
+
+  beforeAll(async () => {
+    response = await request(app).delete(`/articles/33gARk`);
+  });
+
+  test(`Status code is 200`, () => expect(response.statusCode).toBe(200));
+
+  test(`Received deleted article`, () =>
+    expect(response.body.id).toBe(`33gARk`));
+
+  test(`Articles count decreased to 4`, () =>
+    request(app)
+      .get(`/articles`)
+      .expect((res) => {
+        console.log(res.body);
+        expect(res.body.length).toBe(4);
+      }));
 });

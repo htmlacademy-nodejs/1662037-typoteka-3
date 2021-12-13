@@ -44,7 +44,7 @@ module.exports = (app, service) => {
 
     return res
       .status(HttpCode.OK)
-      .send(`Article with id ${deletedItem.id} has been deleted`);
+      .json(deletedItem);
   });
 
   router.get(`/:articleId/comments`, checkArticleExistance(service), async (req, res) => {
@@ -66,7 +66,7 @@ module.exports = (app, service) => {
           res.status(HttpCode.NOT_FOUND).send(`Comment with id ${commentId} not found`);
         }
 
-        return res.status(HttpCode.OK).send(`Comment with id ${deletedComment.id} has been deleted`);
+        return res.status(HttpCode.OK).json(`Comment with id ${deletedComment.id} has been deleted`);
       }
   );
 
