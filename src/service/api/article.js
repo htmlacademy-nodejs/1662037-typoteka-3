@@ -6,11 +6,10 @@ const validateArticle = require(`../middlewares/validate-article`);
 const checkArticleExistance = require(`../middlewares/check-article-existance`);
 const validateComment = require(`../middlewares/validate-comment`);
 
-const router = new Router();
 
 module.exports = (app, service) => {
+  const router = new Router();
   app.use(`/articles`, router);
-
   router.get(`/`, async (req, res) => {
     const articles = await service.findAll();
 

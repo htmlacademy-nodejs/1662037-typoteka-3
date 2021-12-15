@@ -258,13 +258,13 @@ describe(`API correctly deletes article`, () => {
   test(`Received deleted article`, () =>
     expect(response.body.id).toBe(`33gARk`));
 
-  // test(`Articles count decreased to 4`, () =>
-  //   request(app)
-  //     .get(`/articles`)
-  //     .expect((res) => {
-  //       console.log(res.body);
-  //       expect(res.body.length).toBe(4);
-  //     }));
+  test(`Articles count decreased to 4`, () =>
+    request(app)
+      .get(`/articles`)
+      .expect((res) => {
+        console.log(res.body);
+        expect(res.body.length).toBe(4);
+      }));
 });
 
 describe(`API creates a comment with text`, () => {
