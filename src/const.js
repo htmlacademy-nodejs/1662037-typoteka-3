@@ -21,10 +21,16 @@ const HttpCode = {
   CREATED: 201,
 };
 
+const Env = {
+  DEVELOPMENT: `development`,
+  PRODUCTION: `production`,
+};
+
 module.exports = {
   DEFAULT_COMMAND,
   USER_ARGV_INDEX,
   MAX_ID_LENGTH,
   ExitCode,
   HttpCode,
+  Env,
 };

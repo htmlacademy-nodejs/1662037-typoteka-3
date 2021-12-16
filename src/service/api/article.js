@@ -6,11 +6,10 @@ const validateArticle = require(`../middlewares/validate-article`);
 const checkArticleExistance = require(`../middlewares/check-article-existance`);
 const validateComment = require(`../middlewares/validate-comment`);
 
-const router = new Router();
 
 module.exports = (app, service) => {
+  const router = new Router();
   app.use(`/articles`, router);
-
   router.get(`/`, async (req, res) => {
     const articles = await service.findAll();
 
@@ -44,7 +43,7 @@ module.exports = (app, service) => {
 
     return res
       .status(HttpCode.OK)
-      .send(`Article with id ${deletedItem.id} has been deleted`);
+      .json(deletedItem);
   });
 
   router.get(`/:articleId/comments`, checkArticleExistance(service), async (req, res) => {
@@ -63,10 +62,10 @@ module.exports = (app, service) => {
         const deletedComment = await service.deleteComment(article, commentId);
 
         if (!deletedComment) {
-          res.status(HttpCode.NOT_FOUND).send(`Comment with id ${commentId} not found`);
+          return res.status(HttpCode.NOT_FOUND).send(`Comment with id ${commentId} not found`);
         }
 
-        return res.status(HttpCode.OK).send(`Comment with id ${deletedComment.id} has been deleted`);
+        return res.status(HttpCode.OK).json(`Comment with id ${deletedComment.id} has been deleted`);
       }
   );
 
