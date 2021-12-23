@@ -262,7 +262,6 @@ describe(`API correctly deletes article`, () => {
     request(app)
       .get(`/articles`)
       .expect((res) => {
-        console.log(res.body);
         expect(res.body.length).toBe(4);
       }));
 });
