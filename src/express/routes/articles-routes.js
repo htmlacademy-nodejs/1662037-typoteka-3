@@ -4,6 +4,7 @@ const {Router} = require(`express`);
 const upload = require(`../middlewares/upload`);
 const {getAPI} = require(`../api`);
 const {ensureArray} = require(`../../utils`);
+const {HttpCode} = require(`../../const`);
 
 const articlesRouter = new Router();
 const api = getAPI();
@@ -39,11 +40,16 @@ articlesRouter.post(`/add`, upload.single(`upload`), async (req, res) => {
 
 articlesRouter.get(`/edit/:id`, async (req, res) => {
   const {id} = req.params;
-  const [article, categories] = await Promise.all([
-    api.getArticle(id),
-    api.getCategories(),
-  ]);
-  res.render(`admin/post`, {article, categories});
+  try {
+    const [article, categories] = await Promise.all([
+      api.getArticle(id),
+      api.getCategories(),
+    ]);
+    return res.render(`admin/post`, {article, categories});
+  } catch (error) {
+    return res.status(HttpCode.NOT_FOUND).render(`errors/404`);
+  }
+
 });
 
 articlesRouter.get(`/articles-by-category`, (req, res) =>
@@ -52,8 +58,13 @@ articlesRouter.get(`/articles-by-category`, (req, res) =>
 
 articlesRouter.get(`/:id`, async (req, res) => {
   const {id} = req.params;
-  const article = await api.getArticle(id);
-  res.render(`post-detail`, {article});
+
+  try {
+    const article = await api.getArticle(id);
+    return res.render(`post-detail`, {article});
+  } catch (error) {
+    return res.status(HttpCode.NOT_FOUND).render(`errors/404`);
+  }
 });
 
 module.exports = articlesRouter;

@@ -13,13 +13,6 @@ class API {
       baseURL,
       timeout,
     });
-    this._http.interceptors.response.use(
-        (response) => response,
-        (error) => {
-          console.log(error.message);
-          return Promise.reject(error);
-        },
-    );
   }
 
   async _load(url, options) {
