@@ -16,7 +16,6 @@ module.exports = (req, res, next) => {
   const isArticleValid = articleKeys.every((key) =>
     newArticleKeys.includes(key),
   );
-
   return !isArticleValid
     ? res.status(HttpCode.BAD_REQUEST).send(`Bad request. Article is not valid`)
     : next();

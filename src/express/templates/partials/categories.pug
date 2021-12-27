@@ -1,0 +1,8 @@
+section.main-page__theme-list
+  h2.visually-hidden Список тем
+  ul.themes
+    each category of categories
+      li.themes__item
+        a.themes__item-link(href='#')
+          | #{category}
+          sup 88

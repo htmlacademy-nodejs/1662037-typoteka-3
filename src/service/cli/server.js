@@ -27,15 +27,15 @@ module.exports = {
       return next();
     });
 
-    app.use((err, _req, _res, _next) => {
-      logger.error(`An error occurred on processing request: ${err.message}`);
-    });
-
     app.use(API_PREFIX, apiRoter);
 
     app.use((req, res) => {
       res.status(HttpCode.NOT_FOUND).send(`Not found`);
       logger.error(`Route not found: ${req.url}`);
+    });
+
+    app.use((err, _req, _res, _next) => {
+      logger.error(`An error occurred on processing request: ${err.message}`);
     });
 
     try {
