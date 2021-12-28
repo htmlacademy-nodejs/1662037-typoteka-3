@@ -18,4 +18,3 @@ mocks.json
 queries.http
 
 src/express/upload
-queries.sql
