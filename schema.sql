@@ -24,7 +24,7 @@ CREATE TABLE articles
   created_at timestamp DEFAULT current_timestamp,
   user_id integer NOT NULL,
   FOREIGN KEY (user_id) REFERENCES users(id)
-    ON DELETE SET NULL ON UPDATE CASCADE,
+    ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 CREATE TABLE comments
