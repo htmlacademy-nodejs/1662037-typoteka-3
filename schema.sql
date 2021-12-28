@@ -21,7 +21,10 @@ CREATE TABLE articles
   picture varchar(50) NOT NULL,
   announce varchar(255) NOT NULL,
   full_text text NOT NULL,
-  created_ad timestamp DEFAULT current_timestamp
+  created_ad timestamp DEFAULT current_timestamp,
+  user_id integer NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+    ON DELETE SET NULL ON UPDATE CASCADE,
 );
 
 CREATE TABLE comments
