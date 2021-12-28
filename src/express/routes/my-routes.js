@@ -12,8 +12,7 @@ myRouter.get(`/`, async (req, res) => {
 });
 myRouter.get(`/comments`, async (req, res) => {
   const articles = await api.getArticles();
-  let comments = [];
-  articles.forEach((article) => article.comments.length > 0 && comments.push(...article.comments));
+  const comments = articles.flatMap((article) => article.comments);
   res.render(`admin/comments`, {articles, comments});
 });
 myRouter.get(`/post`, (req, res) => res.render(`admin/post`));
