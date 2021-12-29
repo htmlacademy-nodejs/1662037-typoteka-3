@@ -15,6 +15,7 @@ node_modules/
 build/
 
 mocks.json
-querries.http
+queries.http
 
 src/express/upload
+queries.sql
