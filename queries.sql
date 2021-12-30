@@ -1,6 +1,3 @@
--- Delete DB
-DROP DATABASE typoteka;
-
 -- Create DB
 CREATE DATABASE typoteka
   WITH
