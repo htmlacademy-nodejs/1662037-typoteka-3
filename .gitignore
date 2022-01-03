@@ -18,3 +18,4 @@ mocks.json
 queries.http
 
 src/express/upload
+.env

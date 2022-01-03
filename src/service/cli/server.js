@@ -2,6 +2,7 @@
 
 const express = require(`express`);
 const {getLogger} = require(`../lib/logger`);
+const sequelize = require(`../lib/sequelize`);
 const {HttpCode} = require(`../../const`);
 const apiRoter = require(`../api`);
 
@@ -10,9 +11,18 @@ const API_PREFIX = `/api`;
 
 module.exports = {
   name: `--server`,
-  run(args) {
-    const app = express();
+  async run(args) {
     const logger = getLogger({name: `api`});
+    try {
+      logger.info(`Trying to connect to database...`);
+      await sequelize.authenticate();
+    } catch (err) {
+      logger.error(`An error occurred: ${err.message}`);
+      process.exit(1);
+    }
+    logger.info(`Connection to database established`);
+
+    const app = express();
 
     const [customPort] = args;
     const port = Number.parseInt(customPort, 10) || DEFAULT_PORT;
