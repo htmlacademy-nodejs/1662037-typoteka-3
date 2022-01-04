@@ -13,6 +13,7 @@ const FILE_TITLES_PATH = `./data/titles.txt`;
 const FILE_CATEGORIES_PATH = `./data/categories.txt`;
 const FILE_COMMENTS_PATH = `./data/comments.txt`;
 const DEFAULT_COUNT = 5;
+const MAX_CATEGORIES = 3;
 const MAX_ANNOUNCE_SENTENCES = 5;
 const MAX_FULL_TEXT_SENTENCES = 10;
 const MAX_DAYS_PERIOD = 90;
@@ -52,7 +53,7 @@ const generateComments = (comments) =>
 
 const generateCategories = (items) => {
   items = items.slice();
-  let count = getRandomInt(1, items.length - 1);
+  let count = getRandomInt(1, MAX_CATEGORIES);
   const result = [];
   while (count--) {
     result.push(...items.splice(getRandomInt(0, items.length - 1), 1));
@@ -73,7 +74,7 @@ const generateArticles = (count, sentences, titles, categories, comments) =>
       fullText: shuffle(sentences)
         .slice(0, getRandomInt(MAX_ANNOUNCE_SENTENCES, MAX_FULL_TEXT_SENTENCES))
         .join(` `),
-      category: generateCategories(categories),
+      categories: generateCategories(categories),
       comments: generateComments(comments),
     }));
 
@@ -113,6 +114,7 @@ module.exports = {
 
     const articlePromises = articles.map(async (article) => {
       const articleModel = await Article.create(article, {include: [Alias.COMMENTS]});
+
       return await articleModel.addCategories(article.categories);
     });
 
