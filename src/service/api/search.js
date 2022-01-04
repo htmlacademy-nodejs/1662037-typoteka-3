@@ -15,10 +15,10 @@ module.exports = (app, service) => {
       return res.status(HttpCode.BAD_REQUEST).send(`Bad request. Search request should not be empty`);
     }
 
-    const foundItem = await service.find(query);
+    const foundItems = await service.findAll(query);
 
-    return !foundItem
+    return foundItems.length === 0
       ? res.status(HttpCode.NOT_FOUND).send(`Nothing found with "${query}"`)
-      : res.status(HttpCode.OK).json(foundItem);
+      : res.status(HttpCode.OK).json(foundItems);
   });
 };

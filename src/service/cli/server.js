@@ -4,7 +4,7 @@ const express = require(`express`);
 const {getLogger} = require(`../lib/logger`);
 const sequelize = require(`../lib/sequelize`);
 const {HttpCode} = require(`../../const`);
-const apiRoter = require(`../api`);
+const apiRouter = require(`../api`);
 
 const DEFAULT_PORT = 3000;
 const API_PREFIX = `/api`;
@@ -37,7 +37,7 @@ module.exports = {
       return next();
     });
 
-    app.use(API_PREFIX, apiRoter);
+    app.use(API_PREFIX, apiRouter);
 
     app.use((req, res) => {
       res.status(HttpCode.NOT_FOUND).send(`Not found`);

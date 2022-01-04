@@ -1,57 +1,47 @@
 'use strict';
 
-const {nanoid} = require(`nanoid`);
-const {MAX_ID_LENGTH} = require(`../../const`);
+const Alias = require(`../models/alias`);
 
 class ArticlesService {
-  constructor(articles) {
-    this._articles = articles;
+  constructor(sequelize) {
+    this._Article = sequelize.models.Article;
   }
 
-  async findAll() {
-    return this._articles;
+  async findAll(areCommentsNeeded) {
+    const include = [Alias.CATEGORIES];
+
+    if (areCommentsNeeded) {
+      include.push(Alias.COMMENTS);
+    }
+
+    const articles = await this._Article.findAll({
+      include,
+      order: [[`createdAt`, `DESC`]],
+    });
+    return articles.map((article) => article.get());
   }
 
   async findOne(articleId) {
-    return this._articles.find((item) => item.id === articleId);
+    return await this._Article.findByPk(articleId, {
+      include: [Alias.CATEGORIES]
+    });
   }
 
-  async create(article) {
-    const newArticle = Object.assign(
-        {id: nanoid(MAX_ID_LENGTH), comments: []},
-        article,
-    );
-    this._articles.push(newArticle);
-
-    return newArticle;
+  async create(articleData) {
+    const article = await this._Article.create(articleData);
+    await article.addCategories(articleData.categories);
+    return article.get();
   }
 
-  async update(oldArticle, newArticle) {
-    return Object.assign(oldArticle, newArticle);
+  async update(id, newData) {
+    const [updatedRows] = await this._Article.update(newData, {where: {id}});
+    return !!updatedRows;
   }
 
-  async delete(article) {
-    const deletedItem = this._articles.splice(this._articles.indexOf(article), 1);
+  async drop(id) {
+    const deletedRows = await this._Article.destroy({where: {id}});
 
-    return deletedItem[0];
-  }
-
-  async deleteComment(article, commentId) {
-    const deletedComment = article.comments.find((item) => item.id === commentId);
-
-    if (deletedComment) {
-      article.comments.splice(article.comments.indexOf(deletedComment), 1);
-    }
-
-    return deletedComment;
-  }
-
-  async postComment(article, comment) {
-    const newComment = Object.assign({id: nanoid(MAX_ID_LENGTH)}, comment);
-
-    article.comments.push(newComment);
-
-    return newComment;
+    return !!deletedRows;
   }
 }
 

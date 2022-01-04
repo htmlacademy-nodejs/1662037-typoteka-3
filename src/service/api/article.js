@@ -7,73 +7,99 @@ const checkArticleExistance = require(`../middlewares/check-article-existance`);
 const validateComment = require(`../middlewares/validate-comment`);
 
 
-module.exports = (app, service) => {
+module.exports = (app, articleService, commentService) => {
   const router = new Router();
   app.use(`/articles`, router);
   router.get(`/`, async (req, res) => {
-    const articles = await service.findAll();
+    const {comments} = req.query;
+    const articles = await articleService.findAll(comments);
 
     return res.status(HttpCode.OK).json(articles);
   });
 
-  router.get(`/:articleId`, checkArticleExistance(service), async (req, res) => {
+  router.get(`/:articleId`, checkArticleExistance(articleService), async (req, res) => {
     const article = res.locals.article;
 
     return res.status(HttpCode.OK).json(article);
   });
 
   router.post(`/`, validateArticle, async (req, res) => {
-    const newArticle = await service.create(req.body);
+    const newArticle = await articleService.create(req.body);
 
     return res.status(HttpCode.CREATED).json(newArticle);
   });
 
-  router.put(`/:articleId`, [checkArticleExistance(service), validateArticle], async (req, res) => {
-    const oldArticle = res.locals.article;
-    const newArticle = req.body;
+  router.put(`/:articleId`,
+      // [checkArticleExistance(articleService), validateArticle],
+      async (req, res) => {
+        const newData = req.body;
+        const {articleId} = req.params;
 
-    const updatedArticle = await service.update(oldArticle, newArticle);
+        const isUpdated = await articleService.update(articleId, newData);
 
-    return res.status(HttpCode.OK).json(updatedArticle);
-  });
+        if (!isUpdated) {
+          return res.status(HttpCode.BAD_REQUEST).send(`Article hasn't been updated`);
+        }
 
-  router.delete(`/:articleId`, checkArticleExistance(service), async (req, res) => {
-    const article = res.locals.article;
-    const deletedItem = await service.delete(article);
+        return res
+          .status(HttpCode.OK)
+          .json(`Article with id ${articleId} has been updated`);
+      });
 
-    return res
-      .status(HttpCode.OK)
-      .json(deletedItem);
-  });
+  router.delete(`/:articleId`,
+      checkArticleExistance(articleService),
+      async (req, res) => {
+        const {articleId} = req.params;
+        const isDeleted = await articleService.drop(articleId);
 
-  router.get(`/:articleId/comments`, checkArticleExistance(service), async (req, res) => {
-    const article = res.locals.article;
+        if (!isDeleted) {
+          return res
+            .status(HttpCode.BAD_REQUEST)
+            .send(`Article hasn't been deleted`);
+        }
 
-    return res.status(HttpCode.OK).json(article.comments);
-  });
+        return res
+          .status(HttpCode.OK)
+          .json(`Article with id ${articleId} has been deleted`);
+      });
+
+  router.get(`/:articleId/comments`,
+      // checkArticleExistance(articleService),
+      async (req, res) => {
+        const {articleId} = req.params;
+
+        const comments = await commentService.findAll(articleId);
+
+        return res.status(HttpCode.OK).json(comments);
+      });
 
   router.delete(
       `/:articleId/comments/:commentId`,
-      checkArticleExistance(service),
+      // checkArticleExistance(articleService),
       async (req, res) => {
-        const article = res.locals.article;
         const {commentId} = req.params;
 
-        const deletedComment = await service.deleteComment(article, commentId);
+        const isDeleted = await commentService.drop(commentId);
 
-        if (!deletedComment) {
-          return res.status(HttpCode.NOT_FOUND).send(`Comment with id ${commentId} not found`);
+        if (!isDeleted) {
+          return res
+            .status(HttpCode.NOT_FOUND)
+            .send(`Comment with id ${commentId} not found`);
         }
 
-        return res.status(HttpCode.OK).json(`Comment with id ${deletedComment.id} has been deleted`);
+        return res
+          .status(HttpCode.OK)
+          .json(`Comment with id ${commentId} has been deleted`);
       }
   );
 
-  router.post(`/:articleId/comments`, [checkArticleExistance(service), validateComment], async (req, res) => {
-    const article = res.locals.article;
-    const comment = req.body;
-    const newComment = await service.postComment(article, comment);
+  router.post(`/:articleId/comments`,
+      // [checkArticleExistance(articleService), validateComment],
+      async (req, res) => {
+        const {articleId} = req.params;
+        const commentData = req.body;
+        const newComment = await commentService.create(articleId, commentData);
 
-    return res.status(HttpCode.CREATED).json(newComment);
-  });
+        return res.status(HttpCode.CREATED).json(newComment);
+      });
 };

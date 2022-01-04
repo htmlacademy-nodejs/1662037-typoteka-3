@@ -7,10 +7,9 @@ module.exports = (req, res, next) => {
   const newArticleKeys = Object.keys(newArticle);
   const articleKeys = [
     `title`,
-    `createdDate`,
     `announce`,
     `fullText`,
-    `category`,
+    `categories`,
   ];
 
   const isArticleValid = articleKeys.every((key) =>

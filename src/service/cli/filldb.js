@@ -114,8 +114,7 @@ module.exports = {
 
     const articlePromises = articles.map(async (article) => {
       const articleModel = await Article.create(article, {include: [Alias.COMMENTS]});
-
-      return await articleModel.addCategories(article.categories);
+      await articleModel.addCategories(article.categories);
     });
 
     Promise.all(articlePromises);
