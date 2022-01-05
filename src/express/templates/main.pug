@@ -64,20 +64,20 @@ block content
         each article of articles
           li.preview__item
             ul.preview__breadcrumbs
-              each theme of article.category
+              each theme of article.categories
                 li.preview__breadcrumbs-item
-                  a.preview__breadcrumbs-link(href='#') #{theme}
+                  a.preview__breadcrumbs-link(href='#') #{theme.name}
             .preview__background
               img.preview__background-image(src='img/skyscraper@1x.jpg' width='460' height='240' srcset='img/skyscraper@1x.jpg 1x, img/skyscraper@2x.jpg 2x' alt='Фотография небоскреба')
-            time.preview__time(datetime=article.createdDate) #{moment(article.createdDate).format('DD.MM.YYYY, HH:MM')}
+            time.preview__time(datetime=article.createdAt) #{moment(article.createdAt).format('DD.MM.YYYY, HH:MM')}
             h3.preview__name
-              a.preview__name-link(href='#') #{article.title}
+              a.preview__name-link(href=`/articles/${article.id}`) #{article.title}
             p.preview__text
               #{article.fullText}
             a.preview__comment(href='#')
               | Комментарии
               span.preview__cloud
-              b.preview__comment-count #{article.comments.length}
+              b.preview__comment-count &nbsp;#{article.comments.length}
     .preview__toggle-wrapper
       ul.preview__pagination.pagination
         li

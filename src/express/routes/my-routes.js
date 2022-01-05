@@ -11,9 +11,9 @@ myRouter.get(`/`, async (req, res) => {
   res.render(`admin/my`, {articles});
 });
 myRouter.get(`/comments`, async (req, res) => {
-  const articles = await api.getArticles();
+  const articles = await api.getArticles({comments: true});
   const comments = articles.flatMap((article) => article.comments);
-  res.render(`admin/comments`, {articles, comments});
+  res.render(`admin/comments`, {comments});
 });
 myRouter.get(`/post`, (req, res) => res.render(`admin/post`));
 
