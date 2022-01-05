@@ -4,8 +4,7 @@ const fs = require(`fs`).promises;
 const {ExitCode} = require(`../../const`);
 const {getRandomInt, shuffle} = require(`../../utils`);
 const sequelize = require(`../lib/sequelize`);
-const defineModels = require(`../models`);
-const Alias = require(`../models/alias`);
+const initdb = require(`../lib/init-db`);
 const {getLogger} = require(`../lib/logger`);
 
 const FILE_SENTENCES_PATH = `./data/sentences.txt`;
@@ -58,7 +57,7 @@ const generateCategories = (items) => {
   while (count--) {
     result.push(...items.splice(getRandomInt(0, items.length - 1), 1));
   }
-  return result.map((item, index) => index + 1);
+  return result;
 };
 
 const generateArticles = (count, sentences, titles, categories, comments) =>
@@ -100,23 +99,13 @@ module.exports = {
     }
     logger.info(`Connection to database established`);
 
-    const {Category, Article} = defineModels(sequelize);
-    await sequelize.sync({force: true});
-
     const sentences = await readFile(FILE_SENTENCES_PATH);
     const titles = await readFile(FILE_TITLES_PATH);
     const categories = await readFile(FILE_CATEGORIES_PATH);
     const comments = await readFile(FILE_COMMENTS_PATH);
 
-    await Category.bulkCreate(categories.map((item) => ({name: item})));
-
     const articles = generateArticles(count, sentences, titles, categories, comments);
 
-    const articlePromises = articles.map(async (article) => {
-      const articleModel = await Article.create(article, {include: [Alias.COMMENTS]});
-      await articleModel.addCategories(article.categories);
-    });
-
-    Promise.all(articlePromises);
-  },
+    initdb(sequelize, {categories, articles});
+  }
 };

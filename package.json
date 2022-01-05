@@ -28,6 +28,7 @@
     "jest": "27.4.4",
     "nodemon": "2.0.15",
     "pino-pretty": "7.3.0",
+    "sqlite3": "5.0.2",
     "supertest": "6.1.6"
   },
   "dependencies": {
