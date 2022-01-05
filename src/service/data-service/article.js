@@ -23,7 +23,7 @@ class ArticlesService {
 
   async findOne(articleId) {
     return await this._Article.findByPk(articleId, {
-      include: [Alias.CATEGORIES]
+      include: [Alias.CATEGORIES, Alias.COMMENTS]
     });
   }
 

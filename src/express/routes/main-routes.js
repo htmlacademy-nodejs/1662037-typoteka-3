@@ -8,7 +8,7 @@ const api = getAPI();
 
 mainRouter.get(`/`, async (req, res) => {
   const articles = await api.getArticles({comments: true});
-  const categories = await api.getCategories();
+  const categories = await api.getCategories({count: true});
   res.render(`main`, {articles, categories});
 });
 mainRouter.get(`/register`, (req, res) => res.render(`sign-up`));
