@@ -21,6 +21,17 @@ class ArticlesService {
     return articles.map((article) => article.get());
   }
 
+  async findPage({limit, offset}) {
+    const {count, rows} = await this._Article.findAndCountAll({
+      limit,
+      offset,
+      include: [Alias.CATEGORIES, Alias.COMMENTS],
+      order: [[`createdAt`, `DESC`]],
+      distinct: true,
+    });
+    return {count, articles: rows};
+  }
+
   async findOne(articleId) {
     return await this._Article.findByPk(articleId, {
       include: [Alias.CATEGORIES, Alias.COMMENTS]

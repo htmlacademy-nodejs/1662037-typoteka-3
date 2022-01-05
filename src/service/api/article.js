@@ -9,11 +9,18 @@ const validateComment = require(`../middlewares/validate-comment`);
 module.exports = (app, articleService, commentService) => {
   const router = new Router();
   app.use(`/articles`, router);
-  router.get(`/`, async (req, res) => {
-    const {comments} = req.query;
-    const articles = await articleService.findAll(comments);
 
-    return res.status(HttpCode.OK).json(articles);
+  router.get(`/`, async (req, res) => {
+    const {comments, limit, offset} = req.query;
+    let result;
+
+    if (limit || offset) {
+      result = await articleService.findPage({limit, offset});
+    } else {
+      result = await articleService.findAll(comments);
+    }
+
+    return res.status(HttpCode.OK).json(result);
   });
 
   router.get(
