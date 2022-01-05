@@ -9,7 +9,6 @@ module.exports = (req, res, next) => {
     `title`,
     `announce`,
     `fullText`,
-    `categories`,
   ];
 
   const isArticleValid = articleKeys.every((key) =>

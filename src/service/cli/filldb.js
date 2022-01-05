@@ -4,7 +4,7 @@ const fs = require(`fs`).promises;
 const {ExitCode} = require(`../../const`);
 const {getRandomInt, shuffle} = require(`../../utils`);
 const sequelize = require(`../lib/sequelize`);
-const initdb = require(`../lib/init-db`);
+const initDB = require(`../lib/init-db`);
 const {getLogger} = require(`../lib/logger`);
 
 const FILE_SENTENCES_PATH = `./data/sentences.txt`;
@@ -106,6 +106,6 @@ module.exports = {
 
     const articles = generateArticles(count, sentences, titles, categories, comments);
 
-    initdb(sequelize, {categories, articles});
+    initDB(sequelize, {categories, articles});
   }
 };
