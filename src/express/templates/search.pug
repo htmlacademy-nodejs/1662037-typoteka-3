@@ -14,5 +14,5 @@ block content
           .search__result #{results.length === 0 & query !== '' ? 'Ничего не найдено.' : ''}
         each article of results
           .search__result
-            time.search__date(datetime=article.createdDate) #{moment(article.createdDate).format('DD.MM.YYYY, HH:MM')}
+            time.search__date(datetime=article.createdAt) #{moment(article.createdAt).format('DD.MM.YYYY, HH:MM')}
             a.search__link(href=`/articles/${article.id}`) #{article.title}

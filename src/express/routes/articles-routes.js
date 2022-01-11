@@ -20,10 +20,8 @@ articlesRouter.get(`/category/:id`, (req, res) => {
 
 articlesRouter.post(`/add`, upload.single(`upload`), async (req, res) => {
   const {body, file} = req;
-  console.log(req.body);
   const articleData = {
     picture: file ? file.filename : ``,
-    createdDate: body.date,
     title: body.title,
     fullText: body[`full-text`],
     announce: body.announcement,

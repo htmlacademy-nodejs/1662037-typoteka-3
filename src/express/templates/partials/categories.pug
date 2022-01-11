@@ -4,5 +4,5 @@ section.main-page__theme-list
     each category of categories
       li.themes__item
         a.themes__item-link(href='#')
-          | #{category}
-          sup 88
+          | #{category.name}
+          sup #{category.count}
