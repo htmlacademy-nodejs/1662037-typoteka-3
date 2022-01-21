@@ -3,20 +3,15 @@
 const {HttpCode} = require(`../../const`);
 const Joi = require(`joi`);
 
-const ErrorCommentMessage = {
-  TEXT: `Comment is less than 20 symbols`,
-};
-
 const schema = Joi.object({
-  text: Joi.string().min(20).required().messages({
-    'string.min': ErrorCommentMessage.TEXT,
-  }),
+  articleId: Joi.number().integer().min(1),
+  commentId: Joi.number().integer().min(1),
 });
 
 module.exports = (req, res, next) => {
-  const comment = req.body;
+  const params = req.params;
 
-  const {error} = schema.validate(comment, {abortEarly: false});
+  const {error} = schema.validate(params);
 
   if (error) {
     return res

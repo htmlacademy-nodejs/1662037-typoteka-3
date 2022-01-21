@@ -46,6 +46,10 @@ class ArticlesService {
 
   async update(id, newData) {
     const [updatedRows] = await this._Article.update(newData, {where: {id}});
+
+    const article = await this._Article.findByPk(id);
+    await article.setCategories(newData.categories);
+
     return !!updatedRows;
   }
 
