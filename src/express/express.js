@@ -1,6 +1,7 @@
 'use strict';
 
 const express = require(`express`);
+const helmet = require(`helmet`);
 const path = require(`path`);
 const mainRoutes = require(`./routes/main-routes`);
 const articlesRoutes = require(`./routes/articles-routes`);
@@ -17,6 +18,18 @@ app.locals.moment = require(`moment`);
 app.use(express.urlencoded({extended: false}));
 app.use(express.static(path.resolve(__dirname, PUBLIC_DIR)));
 app.use(express.static(path.resolve(__dirname, UPLOAD_DIR)));
+
+app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          // eslint-disable-next-line quotes
+          scriptSrc: ["'self'"],
+        },
+      },
+      xssFilter: true,
+    }),
+);
 
 app.use(`/`, mainRoutes);
 app.use(`/my`, myRoutes);
