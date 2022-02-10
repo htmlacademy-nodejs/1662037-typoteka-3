@@ -22,11 +22,8 @@ html(lang='ru')
   body
     -
       const isChecked = (article, category) => {
-        if (article.categories) {
-          if (typeof article.categories[0] === `object`) {
-            return article.categories.map((item) => item.id).includes(category.id)
-          }
-         return article.categories.includes(category.id)
+        if (article.categories && article.categories.some(item => item === category.id || item.id === category.id) ) {
+          return true;
         }
         return false;
       };
