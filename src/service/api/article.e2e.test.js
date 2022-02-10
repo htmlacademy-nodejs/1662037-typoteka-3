@@ -163,10 +163,10 @@ describe(`API returns an article with given id`, () => {
 
 describe(`API creates an article if data is valid`, () => {
   const newArticle = {
-    title: `Test`,
-    announce: `Test announce`,
-    fullText:
-      `Этот смартфон — настоящая находка. Просто действуйте. Вы можете достичь всего. Простые ежедневные упражнения помогут достичь успеха. Первая большая ёлка была установлена только в 1938 году.`,
+    title: `Test title not less than 30 symbols`,
+    announce: `Test announce not less than 30 symbols`,
+    fullText: `Этот смартфон — настоящая находка. Просто действуйте. Вы можете достичь всего. Простые ежедневные упражнения помогут достичь успеха. Первая большая ёлка была установлена только в 1938 году.`,
+    categories: [1, 3],
   };
 
   let response;
@@ -181,7 +181,7 @@ describe(`API creates an article if data is valid`, () => {
     expect(response.statusCode).toBe(HttpCode.CREATED));
 
   test(`Returns new article`, () =>
-    expect(response.body).toEqual(expect.objectContaining(newArticle)));
+    expect(response.body.title).toEqual(newArticle.title));
 
   test(`Total articles count is changed`, () =>
     request(app)
@@ -199,12 +199,17 @@ describe(`API refuses to create an article if data is invalid`, () => {
     announce: `You can achieve something`,
     fullText: `Так ли это на самом деле? Лучше турбированных двигателей еще ничего не придумали. Этот смартфон — настоящая находка. Стоит только немного постараться и запастись книгами. Игры и программирование разные вещи. Альбом стал настоящим открытием года. Большой и яркий экран мощнейший процессор — всё это в небольшом гаджете. Золотое сечение — соотношение двух величин, гармоническая пропорция.`,
   };
+  let app;
+
+  beforeAll(async () => {
+    app = await createAPI();
+
+  });
 
   test(`Without any of required properties response code is 400`, async () => {
     for (const key of Object.keys(newArticle)) {
       const corruptedArticle = {...newArticle};
       delete corruptedArticle[key];
-      const app = await createAPI();
 
       await request(app)
         .post(`/articles`)
@@ -212,13 +217,40 @@ describe(`API refuses to create an article if data is invalid`, () => {
         .expect(HttpCode.BAD_REQUEST);
     }
   });
+
+  test(`When field type is wrong response code is 400`, async () => {
+    const badArticles = [
+      {...newArticle, picture: 12345},
+      {...newArticle, categories: `Котики`},
+    ];
+    for (const badArticle of badArticles) {
+      await request(app)
+        .post(`/articles`)
+        .send(badArticle)
+        .expect(HttpCode.BAD_REQUEST);
+    }
+  });
+
+  test(`When field value is wrong response code is 400`, async () => {
+    const badArticles = [
+      {...newArticle, title: `too short`},
+      {...newArticle, categories: []}
+    ];
+    for (const badArticle of badArticles) {
+      await request(app)
+        .post(`/articles`)
+        .send(badArticle)
+        .expect(HttpCode.BAD_REQUEST);
+    }
+  });
 });
 
 describe(`API changes article content by received data`, () => {
   const newArticle = {
-    title: `Test`,
-    announce: `You can achieve something`,
+    title: `Test must be not less than 30 symbols. Just to be sure.`,
+    announce: `You can achieve something. Not less than 30 symbols`,
     fullText: `Так ли это на самом деле? Лучше турбированных двигателей еще ничего не придумали. Этот смартфон — настоящая находка. Стоит только немного постараться и запастись книгами. Игры и программирование разные вещи. Альбом стал настоящим открытием года. Большой и яркий экран мощнейший процессор — всё это в небольшом гаджете. Золотое сечение — соотношение двух величин, гармоническая пропорция.`,
+    categories: [1, 3]
   };
   let app;
   let response;
@@ -235,7 +267,7 @@ describe(`API changes article content by received data`, () => {
     request(app)
       .get(`/articles/3`)
       .expect((res) =>
-        expect(res.body).toEqual(expect.objectContaining(newArticle)),
+        expect(res.body.title).toEqual(newArticle.title),
       ));
 });
 
@@ -290,7 +322,7 @@ describe(`API correctly deletes article`, () => {
 
 describe(`API creates a comment with text`, () => {
   const newComment = {
-    text: `Test text`,
+    text: `Test text not less than 20 symbols`,
   };
 
   let response;
@@ -305,8 +337,8 @@ describe(`API creates a comment with text`, () => {
   test(`Status code is 201`, () =>
     expect(response.statusCode).toBe(HttpCode.CREATED));
 
-  test(`Returned comment includes "Test text"`, () =>
-    expect(response.body.text).toBe(`Test text`));
+  test(`Returned comment includes "Test text not less than 20 symbols"`, () =>
+    expect(response.body.text).toBe(`Test text not less than 20 symbols`));
 
   test(`Id key added to new comment`, () =>
     expect(response.body).toHaveProperty(`id`));

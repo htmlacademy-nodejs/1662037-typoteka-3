@@ -68,7 +68,7 @@ block content
                 li.preview__breadcrumbs-item
                   a.preview__breadcrumbs-link(href='#') #{theme.name}
             .preview__background
-              img.preview__background-image(src=`img/${article.picture}` width='460' height='240' srcset=`img/${article.picture} 1x, img/${article.picture.slice(0, -6)}2x.jpg 2x` alt='Фотография небоскреба')
+              img.preview__background-image(src=`img/${article.picture}` width='460' height='240' srcset=`img/${article.picture} 1x, img/${article.picture ? article.picture.slice(0, -6) : ``}2x.jpg 2x` alt='Фотография небоскреба')
             time.preview__time(datetime=article.createdAt) #{moment(article.createdAt).format('DD.MM.YYYY, HH:MM')}
             h3.preview__name
               a.preview__name-link(href=`/articles/${article.id}`) #{article.title}

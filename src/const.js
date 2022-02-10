@@ -26,11 +26,19 @@ const Env = {
   PRODUCTION: `production`,
 };
 
+const HttpMethod = {
+  GET: `GET`,
+  POST: `POST`,
+  PUT: `PUT`,
+  DELETE: `DELETE`,
+};
+
 module.exports = {
   DEFAULT_COMMAND,
   USER_ARGV_INDEX,
   MAX_ID_LENGTH,
   ExitCode,
   HttpCode,
+  HttpMethod,
   Env,
 };

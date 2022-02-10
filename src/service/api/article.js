@@ -5,6 +5,7 @@ const {HttpCode} = require(`../../const`);
 const validateArticle = require(`../middlewares/validate-article`);
 const checkArticleExistance = require(`../middlewares/check-article-existance`);
 const validateComment = require(`../middlewares/validate-comment`);
+const validateRouteParams = require(`../middlewares/route-params-validator`);
 
 module.exports = (app, articleService, commentService) => {
   const router = new Router();
@@ -25,7 +26,10 @@ module.exports = (app, articleService, commentService) => {
 
   router.get(
       `/:articleId`,
-      checkArticleExistance(articleService),
+      [
+        validateRouteParams,
+        checkArticleExistance(articleService)
+      ],
       async (req, res) => {
         const article = res.locals.article;
 
@@ -41,7 +45,10 @@ module.exports = (app, articleService, commentService) => {
 
   router.put(
       `/:articleId`,
-      [checkArticleExistance(articleService), validateArticle],
+      [
+        validateRouteParams,
+        checkArticleExistance(articleService), validateArticle
+      ],
       async (req, res) => {
         const newData = req.body;
         const {articleId} = req.params;
@@ -62,7 +69,10 @@ module.exports = (app, articleService, commentService) => {
 
   router.delete(
       `/:articleId`,
-      checkArticleExistance(articleService),
+      [
+        validateRouteParams,
+        checkArticleExistance(articleService),
+      ],
       async (req, res) => {
         const {articleId} = req.params;
         const isDeleted = await articleService.drop(articleId);
@@ -81,7 +91,10 @@ module.exports = (app, articleService, commentService) => {
 
   router.get(
       `/:articleId/comments`,
-      checkArticleExistance(articleService),
+      [
+        validateRouteParams,
+        checkArticleExistance(articleService),
+      ],
       async (req, res) => {
         const {articleId} = req.params;
 
@@ -93,7 +106,10 @@ module.exports = (app, articleService, commentService) => {
 
   router.delete(
       `/:articleId/comments/:commentId`,
-      checkArticleExistance(articleService),
+      [
+        validateRouteParams,
+        checkArticleExistance(articleService),
+      ],
       async (req, res) => {
         const {commentId} = req.params;
 
@@ -113,7 +129,10 @@ module.exports = (app, articleService, commentService) => {
 
   router.post(
       `/:articleId/comments`,
-      [checkArticleExistance(articleService), validateComment],
+      [
+        validateRouteParams,
+        checkArticleExistance(articleService), validateComment
+      ],
       async (req, res) => {
         const {articleId} = req.params;
         const commentData = req.body;
