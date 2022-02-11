@@ -21,12 +21,7 @@ html(lang='ru')
 
   body
     -
-      const isChecked = (article, category) => {
-        if (article.categories && article.categories.some(item => item === category.id || item.id === category.id) ) {
-          return true;
-        }
-        return false;
-      };
+      const isChecked = (article, {id}) => article.categories && article.categories.some(item => item === id || item.id === id);
 
     mixin insertErrorMessage(messages)
       if messages
