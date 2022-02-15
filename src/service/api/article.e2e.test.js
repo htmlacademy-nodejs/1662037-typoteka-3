@@ -124,42 +124,14 @@ const mockArticles = [
 
 const createAPI = async () => {
   const mockDB = new Sequelize(`sqlite::memory:`, {logging: false});
+  console.log(1);
   await initDB(mockDB, {categories: mockCategories, articles: mockArticles});
+  console.log(2);
   const app = express();
   app.use(express.json());
   article(app, new ArticleService(mockDB), new CommentService(mockDB));
   return app;
 };
-
-
-describe(`API returns a list of all articles`, () => {
-  let response;
-
-  beforeAll(async () => {
-    const app = await createAPI();
-    response = await request(app).get(`/articles`);
-  });
-
-  test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
-
-  test(`Returns list of 5 articles`, () =>
-    expect(response.body.length).toBe(5));
-});
-
-describe(`API returns an article with given id`, () => {
-
-  let response;
-
-  beforeAll(async () => {
-    const app = await createAPI();
-    response = await request(app).get(`/articles/1`);
-  });
-
-  test(`Status code is 200`, () => expect(response.statusCode).toBe(200));
-
-  test(`Offer title is "Оценка авторынка"`, () =>
-    expect(response.body.title).toBe(`Оценка авторынка`));
-});
 
 describe(`API creates an article if data is valid`, () => {
   const newArticle = {
@@ -192,6 +164,36 @@ describe(`API creates an article if data is valid`, () => {
     expect(response.body).toHaveProperty(`id`);
   });
 });
+
+describe(`API returns a list of all articles`, () => {
+  let response;
+
+  beforeAll(async () => {
+    const app = await createAPI();
+    response = await request(app).get(`/articles`);
+  });
+
+  test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
+
+  test(`Returns list of 5 articles`, () =>
+    expect(response.body.length).toBe(5));
+});
+
+describe(`API returns an article with given id`, () => {
+
+  let response;
+
+  beforeAll(async () => {
+    const app = await createAPI();
+    response = await request(app).get(`/articles/1`);
+  });
+
+  test(`Status code is 200`, () => expect(response.statusCode).toBe(200));
+
+  test(`Offer title is "Оценка авторынка"`, () =>
+    expect(response.body.title).toBe(`Оценка авторынка`));
+});
+
 
 describe(`API refuses to create an article if data is invalid`, () => {
   const newArticle = {

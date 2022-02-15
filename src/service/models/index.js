@@ -19,7 +19,7 @@ const define = (sequelize) => {
     foreignKey: `articleId`,
     onDelete: `cascade`,
   });
-  Comment.belongsTo(Article, {foreignKey: `articleId`});
+  Comment.belongsTo(Article, {as: Alias.ARTICLES, foreignKey: `articleId`});
 
   Article.belongsToMany(Category, {through: ArticleCategory, as: Alias.CATEGORIES, foreignKey: `articleId`});
   Category.belongsToMany(Article, {
