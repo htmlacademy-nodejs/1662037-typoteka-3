@@ -1,15 +1,25 @@
 'use strict';
 
+const Alias = require(`../models/alias`);
+
 class CommentService {
   constructor(sequelize) {
     this._Comment = sequelize.models.Comment;
     this._Article = sequelize.models.Article;
+    this._User = sequelize.models.User;
   }
 
   async findAll(articleId) {
     return await this._Comment.findAll({
       where: {articleId},
       raw: true,
+      include: [
+        {
+          model: this._User,
+          as: Alias.USERS,
+          attributes: [`avatar`, `name`],
+        },
+      ],
     });
   }
 

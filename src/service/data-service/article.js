@@ -5,13 +5,32 @@ const Alias = require(`../models/alias`);
 class ArticlesService {
   constructor(sequelize) {
     this._Article = sequelize.models.Article;
+    this._User = sequelize.models.User;
+    this._Comment = sequelize.models.Comment;
   }
 
   async findAll(areCommentsNeeded) {
-    const include = [Alias.CATEGORIES];
+    const include = [
+      Alias.CATEGORIES,
+      {
+        model: this._User,
+        as: Alias.USERS,
+        attributes: {exclude: [`passwordHash`]},
+      },
+    ];
 
     if (areCommentsNeeded) {
-      include.push(Alias.COMMENTS);
+      include.push({
+        model: this._Comment,
+        as: Alias.COMMENTS,
+        include: [
+          {
+            model: this._User,
+            as: Alias.USERS,
+            attributes: {exclude: [`passwordHash`]},
+          },
+        ],
+      });
     }
 
     const articles = await this._Article.findAll({
@@ -34,7 +53,25 @@ class ArticlesService {
 
   async findOne(articleId) {
     return await this._Article.findByPk(articleId, {
-      include: [Alias.CATEGORIES, Alias.COMMENTS]
+      include: [
+        Alias.CATEGORIES,
+        {
+          model: this._Comment,
+          as: Alias.COMMENTS,
+          include: [
+            {
+              model: this._User,
+              as: Alias.USERS,
+              attributes: {exclude: [`passwordHash`]},
+            },
+          ],
+        },
+        {
+          model: this._User,
+          as: Alias.USERS,
+          attributes: {exclude: [`passwordHash`]},
+        },
+      ],
     });
   }
 
