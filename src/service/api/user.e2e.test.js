@@ -5,11 +5,9 @@ const request = require(`supertest`);
 const Sequelize = require(`sequelize`);
 
 const initDB = require(`../lib/init-db`);
-const article = require(`./article`);
-const ArticleService = require(`../data-service/article`);
-const CommentService = require(`../data-service/comment`);
+const user = require(`./user`);
+const UserService = require(`../data-service/user`);
 const passwordUtils = require(`../lib/password`);
-
 const {HttpCode} = require(`../../const`);
 
 const mockUsers = [
@@ -161,259 +159,95 @@ const createAPI = async () => {
   });
   const app = express();
   app.use(express.json());
-  article(app, new ArticleService(mockDB), new CommentService(mockDB));
+  user(app, new UserService(mockDB));
   return app;
 };
 
-describe(`API creates an article if data is valid`, () => {
-  const newArticle = {
-    title: `Test title not less than 30 symbols`,
-    announce: `Test announce not less than 30 symbols`,
-    userId: 1,
-    fullText: `Этот смартфон — настоящая находка. Просто действуйте. Вы можете достичь всего. Простые ежедневные упражнения помогут достичь успеха. Первая большая ёлка была установлена только в 1938 году.`,
-    categories: [1, 3],
+describe(`API creates user if data is valid`, () => {
+  const validUserData = {
+    name: `Сидор Сидоров`,
+    email: `sidorov@example.com`,
+    password: `sidorov`,
+    passwordRepeated: `sidorov`,
+    avatar: `sidorov.jpg`,
   };
 
   let response;
-  let app;
 
   beforeAll(async () => {
-    app = await createAPI();
-    response = await request(app).post(`/articles`).send(newArticle);
+    let app = await createAPI();
+    response = await request(app).post(`/user`).send(validUserData);
   });
 
-  test(`Status code is 201`, () =>
+  test(`Status code 201`, () =>
     expect(response.statusCode).toBe(HttpCode.CREATED));
-
-  test(`Returns new article`, () =>
-    expect(response.body.title).toEqual(newArticle.title));
-
-  test(`Total articles count is changed`, () =>
-    request(app)
-      .get(`/articles`)
-      .expect((res) => expect(res.body.length).toBe(6)));
-
-  test(`id key is added to article object`, () => {
-    expect(response.body).toHaveProperty(`id`);
-  });
 });
 
-describe(`API returns a list of all articles`, () => {
-  let response;
-
-  beforeAll(async () => {
-    const app = await createAPI();
-    response = await request(app).get(`/articles`);
-  });
-
-  test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
-
-  test(`Returns list of 5 articles`, () =>
-    expect(response.body.length).toBe(5));
-});
-
-describe(`API returns an article with given id`, () => {
-  let response;
-
-  beforeAll(async () => {
-    const app = await createAPI();
-    response = await request(app).get(`/articles/1`);
-  });
-
-  test(`Status code is 200`, () => expect(response.statusCode).toBe(200));
-
-  test(`Offer title is "Оценка авторынка"`, () =>
-    expect(response.body.title).toBe(`Оценка авторынка`));
-});
-
-describe(`API refuses to create an article if data is invalid`, () => {
-  const newArticle = {
-    title: `Test`,
-    announce: `You can achieve something`,
-    user: `ivanov@example.com`,
-    fullText: `Так ли это на самом деле? Лучше турбированных двигателей еще ничего не придумали. Этот смартфон — настоящая находка. Стоит только немного постараться и запастись книгами. Игры и программирование разные вещи. Альбом стал настоящим открытием года. Большой и яркий экран мощнейший процессор — всё это в небольшом гаджете. Золотое сечение — соотношение двух величин, гармоническая пропорция.`,
-    userId: 1
+describe(`API refuses to create user if data is invalid`, () => {
+  const validUserData = {
+    name: `Сидор Сидоров`,
+    email: `sidorov@example.com`,
+    password: `sidorov`,
+    passwordRepeated: `sidorov`,
+    avatar: `sidorov.jpg`,
   };
+
   let app;
 
   beforeAll(async () => {
     app = await createAPI();
   });
 
-  test(`Without any of required properties response code is 400`, async () => {
-    for (const key of Object.keys(newArticle)) {
-      const corruptedArticle = {...newArticle};
-      delete corruptedArticle[key];
-
+  test(`Without any required property response code is 400`, async () => {
+    for (const key of Object.keys(validUserData)) {
+      const badUserData = {...validUserData};
+      delete badUserData[key];
       await request(app)
-        .post(`/articles`)
-        .send(corruptedArticle)
+        .post(`/user`)
+        .send(badUserData)
         .expect(HttpCode.BAD_REQUEST);
     }
   });
 
   test(`When field type is wrong response code is 400`, async () => {
-    const badArticles = [
-      {...newArticle, picture: 12345},
-      {...newArticle, categories: `Котики`},
+    const badUsers = [
+      {...validUserData, firstName: true},
+      {...validUserData, email: 1},
     ];
-    for (const badArticle of badArticles) {
+    for (const badUserData of badUsers) {
       await request(app)
-        .post(`/articles`)
-        .send(badArticle)
+        .post(`/user`)
+        .send(badUserData)
         .expect(HttpCode.BAD_REQUEST);
     }
   });
 
   test(`When field value is wrong response code is 400`, async () => {
-    const badArticles = [
-      {...newArticle, title: `too short`},
-      {...newArticle, categories: []},
+    const badUsers = [
+      {...validUserData, password: `short`, passwordRepeated: `short`},
+      {...validUserData, email: `invalid`},
     ];
-    for (const badArticle of badArticles) {
+    for (const badUserData of badUsers) {
       await request(app)
-        .post(`/articles`)
-        .send(badArticle)
+        .post(`/user`)
+        .send(badUserData)
         .expect(HttpCode.BAD_REQUEST);
     }
   });
-});
 
-describe(`API changes article content by received data`, () => {
-  const newArticle = {
-    title: `Test must be not less than 30 symbols. Just to be sure.`,
-    announce: `You can achieve something. Not less than 30 symbols`,
-    fullText: `Так ли это на самом деле? Лучше турбированных двигателей еще ничего не придумали. Этот смартфон — настоящая находка. Стоит только немного постараться и запастись книгами. Игры и программирование разные вещи. Альбом стал настоящим открытием года. Большой и яркий экран мощнейший процессор — всё это в небольшом гаджете. Золотое сечение — соотношение двух величин, гармоническая пропорция.`,
-    categories: [1, 3],
-    userId: 1
-  };
-  let app;
-  let response;
-
-  beforeAll(async () => {
-    app = await createAPI();
-    response = await request(app).put(`/articles/2`).send(newArticle);
+  test(`When password and passwordRepeated are not equal, code is 400`, async () => {
+    const badUserData = {...validUserData, passwordRepeated: `not sidorov`};
+    await request(app)
+      .post(`/user`)
+      .send(badUserData)
+      .expect(HttpCode.BAD_REQUEST);
   });
 
-  test(`Status code is 200`, () =>
-    expect(response.statusCode).toBe(HttpCode.OK));
-
-  test(`Article is really changed in articles list`, () =>
-    request(app)
-      .get(`/articles/2`)
-      .expect((res) => expect(res.body.title).toEqual(newArticle.title)));
-});
-
-test(`API returns status code 404 when trying to change non-existing article`, async () => {
-  const newArticle = {
-    title: `Test`,
-    announce: `You can achieve something`,
-    user: `ivanov@example.com`,
-    fullText: `Так ли это на самом деле? Лучше турбированных двигателей еще ничего не придумали. Этот смартфон — настоящая находка. Стоит только немного постараться и запастись книгами. Игры и программирование разные вещи. Альбом стал настоящим открытием года. Большой и яркий экран мощнейший процессор — всё это в небольшом гаджете. Золотое сечение — соотношение двух величин, гармоническая пропорция.`,
-    categories: [1, 3],
-  };
-
-  const app = await createAPI();
-
-  return request(app)
-    .put(`/articles/1000`)
-    .send(newArticle)
-    .expect(HttpCode.NOT_FOUND);
-});
-
-test(`API returns status code 400 when trying to change article with invalid data`, async () => {
-  const newArticle = {
-    title: `Test`,
-    announce: `You can achieve something`,
-  };
-
-  const app = await createAPI();
-
-  return request(app)
-    .put(`/articles/4`)
-    .send(newArticle)
-    .expect(HttpCode.BAD_REQUEST);
-});
-
-describe(`API correctly deletes article`, () => {
-  let app;
-  let response;
-
-  beforeAll(async () => {
-    app = await createAPI();
-    response = await request(app).delete(`/articles/5`);
+  test(`When email is already in use status code is 400`, async () => {
+    const badUserData = {...validUserData, email: `ivanov@example.com`};
+    await request(app)
+      .post(`/user`)
+      .send(badUserData)
+      .expect(HttpCode.BAD_REQUEST);
   });
-
-  test(`Status code is 200`, () => expect(response.statusCode).toBe(200));
-
-  test(`Articles count decreased to 4`, () =>
-    request(app)
-      .get(`/articles`)
-      .expect((res) => {
-        expect(res.body.length).toBe(4);
-      }));
-});
-
-describe(`API creates a comment with text`, () => {
-  const newComment = {
-    text: `Test text not less than 20 symbols`,
-    userId: 2
-  };
-
-  let response;
-
-  beforeAll(async () => {
-    const app = await createAPI();
-    response = await request(app).post(`/articles/3/comments`).send(newComment);
-  });
-
-  test(`Status code is 201`, () =>
-    expect(response.statusCode).toBe(HttpCode.CREATED));
-
-  test(`Returned comment includes "Test text not less than 20 symbols"`, () =>
-    expect(response.body.text).toBe(`Test text not less than 20 symbols`));
-
-  test(`Id key added to new comment`, () =>
-    expect(response.body).toHaveProperty(`id`));
-});
-
-test(`API refuses to create a comment to non-existent article and returns status code 404`, async () => {
-  const app = await createAPI();
-
-  return request(app)
-    .post(`/articles/1000/comments`)
-    .send({
-      text: `Some text`,
-    })
-    .expect(HttpCode.NOT_FOUND);
-});
-
-test(`API refuses to create a comment without text field`, async () => {
-  const app = await createAPI();
-
-  return request(app)
-    .post(`/articles/3/comments`)
-    .send({
-      test: `Wrong key`,
-    })
-    .expect(HttpCode.BAD_REQUEST);
-});
-
-test(`API refuses to create a comment with empty text field`, async () => {
-  const app = await createAPI();
-
-  return request(app)
-    .post(`/articles/3/comments`)
-    .send({
-      text: ``,
-    })
-    .expect(HttpCode.BAD_REQUEST);
-});
-
-test(`API refuses to delete non-existent comment`, async () => {
-  const app = await createAPI();
-
-  return request(app)
-    .delete(`/articles/3/comments/100`)
-    .expect(HttpCode.NOT_FOUND);
 });

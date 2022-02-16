@@ -9,12 +9,12 @@ module.exports = (app, userService) => {
   const router = new Router();
   app.use(`/user`, router);
 
-  router.post(`/`, validateUser, async (req, res) => {
+  router.post(`/`, validateUser(userService), async (req, res) => {
     const userData = req.body;
     userData.passwordHash = await hash(userData.password);
 
     const newUser = await userService.create(userData);
-    newUser.delete(`passwordHash`);
+    delete newUser.passwordHash;
 
     return res.status(HttpCode.CREATED).json(newUser);
   });

@@ -30,7 +30,6 @@ module.exports = async (sequelize, {categories, articles, users}) => {
   );
 
   articles.forEach((article) => {
-    console.log(article.user, userIdByEmail[article.user.email]);
     article.userId = userIdByEmail[article.user.email];
     article.comments.forEach((comment) => {
       comment.userId = userIdByEmail[comment.user.email];
