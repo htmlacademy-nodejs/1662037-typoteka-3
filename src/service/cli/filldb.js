@@ -14,7 +14,7 @@ const FILE_CATEGORIES_PATH = `./data/categories.txt`;
 const FILE_COMMENTS_PATH = `./data/comments.txt`;
 const DEFAULT_COUNT = 5;
 const MAX_CATEGORIES = 3;
-const MAX_ANNOUNCE_SENTENCES = 5;
+const MAX_ANNOUNCE_SENTENCES = 3;
 const MAX_FULL_TEXT_SENTENCES = 10;
 const MAX_DAYS_PERIOD = 90;
 const MAX_RECORDS = 1000;
@@ -111,25 +111,25 @@ module.exports = {
         name: `Иван Иванов`,
         email: `ivanov@example.com`,
         passwordHash: await passwordUtils.hash(`ivanov`),
-        avatar: `avatar01.jpg`,
+        avatar: `avatar-1.png`,
       },
       {
         name: `Пётр Петров`,
         email: `petrov@example.com`,
         passwordHash: await passwordUtils.hash(`petrov`),
-        avatar: `avatar02.jpg`,
+        avatar: `avatar-2.png`,
       },
       {
         name: `Семен Семенов`,
         email: `semon@example.com`,
         passwordHash: await passwordUtils.hash(`semonov`),
-        avatar: `avatar03.jpg`,
+        avatar: `avatar-3.png`,
       },
       {
         name: `Марина Яровицина`,
         email: `marina@example.com`,
         passwordHash: await passwordUtils.hash(`yarovizina`),
-        avatar: `avatar04.jpg`,
+        avatar: `avatar-4.png`,
       },
     ];
 

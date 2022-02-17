@@ -2,6 +2,7 @@
 
 const {Router} = require(`express`);
 const {getAPI} = require(`../api`);
+const upload = require(`../middlewares/upload`);
 
 const OFFERS_PER_PAGE = 8;
 
@@ -26,6 +27,25 @@ mainRouter.get(`/`, async (req, res) => {
 });
 
 mainRouter.get(`/register`, (req, res) => res.render(`sign-up`));
+mainRouter.post(`/register`, upload.single(`upload`), async (req, res) => {
+  const {body, file} = req;
+  const userData = {
+    avatar: file ? file.filename : ``,
+    name: body.name,
+    email: body.email,
+    password: body.password,
+    passwordRepeated: body[`repeat-password`],
+  };
+
+  try {
+    await api.createUser(userData);
+    res.redirect(`/login`);
+  } catch (errors) {
+    const validationMessages = errors.response.data;
+    res.render(`sign-up`, {validationMessages});
+  }
+});
+
 mainRouter.get(`/login`, (req, res) => res.render(`login`));
 mainRouter.get(`/search`, async (req, res) => {
   const {query} = req.query;

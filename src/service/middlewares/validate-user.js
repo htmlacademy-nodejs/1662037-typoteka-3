@@ -44,7 +44,7 @@ module.exports = (service) => async (req, res, next) => {
   if (error) {
     return res
       .status(HttpCode.BAD_REQUEST)
-      .send(error.details.map((err) => err.message).join(`\n`));
+      .send(error.details.map((err) => err.message));
   }
 
   const userByEmail = await service.findByEmail(req.body.email);
