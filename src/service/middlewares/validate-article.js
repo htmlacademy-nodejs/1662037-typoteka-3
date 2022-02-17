@@ -17,6 +17,7 @@ const ErrorArticleMessage = {
   ANNOUNCE_EMPTY: `Announce is not allowed to be empty`,
   FULL_TEXT_MAX: `Full text is longer that ${MAX_FULL_DESCRIPTION} symbols`,
   FULL_TEXT_EMPTY: `Full text is not allowed to be empty`,
+  USER_ID: `User ID is invalid`,
 };
 
 const schema = Joi.object({
@@ -43,6 +44,9 @@ const schema = Joi.object({
     .min(1)
     .required(),
   picture: Joi.string().allow(null).allow(``).optional(),
+  userId: Joi.number().integer().positive().required().messages({
+    'number.base': ErrorArticleMessage.USER_ID,
+  }),
 });
 
 module.exports = (req, res, next) => {

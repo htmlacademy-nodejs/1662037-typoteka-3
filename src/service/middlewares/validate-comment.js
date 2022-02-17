@@ -7,11 +7,15 @@ const MIN_SYMBOLS = 20;
 
 const ErrorCommentMessage = {
   TEXT: `Comment is less than ${MIN_SYMBOLS} symbols`,
+  USER_ID: `User ID is invalid`,
 };
 
 const schema = Joi.object({
   text: Joi.string().min(MIN_SYMBOLS).required().messages({
     'string.min': ErrorCommentMessage.TEXT,
+  }),
+  userId: Joi.number().integer().positive().required().messages({
+    'number.base': ErrorCommentMessage.USER_ID,
   }),
 });
 

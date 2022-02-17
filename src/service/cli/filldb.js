@@ -1,11 +1,12 @@
 'use strict';
 
 const fs = require(`fs`).promises;
-const {ExitCode} = require(`../../const`);
+const {ExitCode, UserRole} = require(`../../const`);
 const {getRandomInt, shuffle} = require(`../../utils`);
 const sequelize = require(`../lib/sequelize`);
 const initDB = require(`../lib/init-db`);
 const {getLogger} = require(`../lib/logger`);
+const passwordUtils = require(`../lib/password`);
 
 const FILE_SENTENCES_PATH = `./data/sentences.txt`;
 const FILE_TITLES_PATH = `./data/titles.txt`;
@@ -13,7 +14,7 @@ const FILE_CATEGORIES_PATH = `./data/categories.txt`;
 const FILE_COMMENTS_PATH = `./data/comments.txt`;
 const DEFAULT_COUNT = 5;
 const MAX_CATEGORIES = 3;
-const MAX_ANNOUNCE_SENTENCES = 5;
+const MAX_ANNOUNCE_SENTENCES = 3;
 const MAX_FULL_TEXT_SENTENCES = 10;
 const MAX_DAYS_PERIOD = 90;
 const MAX_RECORDS = 1000;
@@ -41,13 +42,14 @@ const getRandomDate = () => {
   );
 };
 
-const generateComments = (comments) =>
+const generateComments = (comments, users) =>
   Array(getRandomInt(0, MAX_COMMENTS_COUNT))
     .fill({})
     .map(() => ({
       text: shuffle(comments)
         .slice(0, getRandomInt(1, MAX_COMMENT_SENTENCES))
         .join(` `),
+      user: users[getRandomInt(0, users.length - 1)],
     }));
 
 const generateCategories = (items) => {
@@ -60,7 +62,7 @@ const generateCategories = (items) => {
   return result;
 };
 
-const generateArticles = (count, sentences, titles, categories, comments) =>
+const generateArticles = (count, sentences, titles, categories, comments, users) =>
   Array(count)
     .fill({})
     .map(() => ({
@@ -74,7 +76,8 @@ const generateArticles = (count, sentences, titles, categories, comments) =>
         .slice(0, getRandomInt(MAX_ANNOUNCE_SENTENCES, MAX_FULL_TEXT_SENTENCES))
         .join(` `),
       categories: generateCategories(categories),
-      comments: generateComments(comments),
+      comments: generateComments(comments, users),
+      user: users[getRandomInt(0, users.length - 1)],
     }));
 
 module.exports = {
@@ -103,9 +106,43 @@ module.exports = {
     const titles = await readFile(FILE_TITLES_PATH);
     const categories = await readFile(FILE_CATEGORIES_PATH);
     const comments = await readFile(FILE_COMMENTS_PATH);
+    const users = [
+      {
+        name: `Иван`,
+        surname: `Иванов`,
+        email: `ivanov@example.com`,
+        passwordHash: await passwordUtils.hash(`ivanov`),
+        avatar: `avatar-1.png`,
+        role: UserRole.ADMIN,
+      },
+      {
+        name: `Пётр`,
+        surname: `Петров`,
+        email: `petrov@example.com`,
+        passwordHash: await passwordUtils.hash(`petrov`),
+        avatar: `avatar-2.png`,
+        role: UserRole.USER,
+      },
+      {
+        name: `Семен`,
+        surname: `Семенов`,
+        email: `semon@example.com`,
+        passwordHash: await passwordUtils.hash(`semonov`),
+        avatar: `avatar-3.png`,
+        role: UserRole.USER,
+      },
+      {
+        name: `Марина`,
+        surname: `Яровицина`,
+        email: `marina@example.com`,
+        passwordHash: await passwordUtils.hash(`yarovizina`),
+        avatar: `avatar-4.png`,
+        role: UserRole.USER,
+      },
+    ];
 
-    const articles = generateArticles(count, sentences, titles, categories, comments);
+    const articles = generateArticles(count, sentences, titles, categories, comments, users);
 
-    initDB(sequelize, {categories, articles});
+    initDB(sequelize, {categories, articles, users});
   }
 };

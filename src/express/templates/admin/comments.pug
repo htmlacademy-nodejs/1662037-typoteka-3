@@ -8,8 +8,8 @@ block content
         each comment of comments
           li.publication__list-item
             .publication__header
-              img.publication__list-image(src='/img/avatar-small-2.png' width='20' height='20' alt='Аватар пользователя')
-              b.publication__list-name Александр Петров
+              img.publication__list-image(src=comment.users.avatar width='20' height='20' alt='Аватар пользователя')
+              b.publication__list-name #{comment.users.name} #{comment.users.surname}
               time.publication__item-time(datetime=comment.createdAt) #{moment(comment.createdAt).format('DD.MM.YYYY, HH:MM')}
             a.publication__item-text(href='#') #{comment.text}
             p.publication__text-strong

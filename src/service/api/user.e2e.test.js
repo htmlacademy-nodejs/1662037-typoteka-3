@@ -5,11 +5,29 @@ const request = require(`supertest`);
 const Sequelize = require(`sequelize`);
 
 const initDB = require(`../lib/init-db`);
-const category = require(`./category`);
-const DataService = require(`../data-service/category`);
-const {HttpCode, UserRole} = require(`../../const`);
+const user = require(`./user`);
+const UserService = require(`../data-service/user`);
 const passwordUtils = require(`../lib/password`);
+const {HttpCode, UserRole} = require(`../../const`);
 
+const mockUsers = [
+  {
+    name: `Иван`,
+    surname: `Иванов`,
+    email: `ivanov@example.com`,
+    passwordHash: passwordUtils.hashSync(`ivanov`),
+    avatar: `avatar01.jpg`,
+    role: UserRole.ADMIN,
+  },
+  {
+    name: `Пётр`,
+    surname: `Петров`,
+    email: `petrov@example.com`,
+    passwordHash: passwordUtils.hashSync(`petrov`),
+    avatar: `avatar02.jpg`,
+    role: UserRole.USER,
+  },
+];
 
 const mockCategories = [`Животные`, `Журналы`, `Игры`, `IT`];
 
@@ -136,48 +154,106 @@ const mockArticles = [
   },
 ];
 
-const mockUsers = [
-  {
-    name: `Иван`,
-    surname: `Иванов`,
-    email: `ivanov@example.com`,
-    passwordHash: passwordUtils.hashSync(`ivanov`),
-    avatar: `avatar01.jpg`,
-    role: UserRole.ADMIN,
-  },
-  {
-    name: `Пётр`,
-    surname: `Петров`,
-    email: `petrov@example.com`,
-    passwordHash: passwordUtils.hashSync(`petrov`),
-    avatar: `avatar02.jpg`,
-    role: UserRole.USER,
-  },
-];
+const createAPI = async () => {
+  const mockDB = new Sequelize(`sqlite::memory:`, {logging: false});
+  await initDB(mockDB, {
+    categories: mockCategories,
+    articles: mockArticles,
+    users: mockUsers,
+  });
+  const app = express();
+  app.use(express.json());
+  user(app, new UserService(mockDB));
+  return app;
+};
 
-const app = express();
-app.use(express.json());
-const mockDB = new Sequelize(`sqlite::memory:`, {logging: false});
+describe(`API creates user if data is valid`, () => {
+  const validUserData = {
+    name: `Сидор`,
+    surname: `Сидоров`,
+    email: `sidorov@example.com`,
+    password: `sidorov`,
+    passwordRepeated: `sidorov`,
+    avatar: `sidorov.jpg`,
+  };
 
-beforeAll(async () => {
-  await initDB(mockDB, {categories: mockCategories, articles: mockArticles, users: mockUsers});
-  category(app, new DataService(mockDB));
-});
-
-describe(`API returns category list`, () => {
   let response;
 
   beforeAll(async () => {
-    response = await request(app).get(`/category`);
+    let app = await createAPI();
+    response = await request(app).post(`/user`).send(validUserData);
   });
 
-  test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
+  test(`Status code 201`, () =>
+    expect(response.statusCode).toBe(HttpCode.CREATED));
+});
 
-  test(`Returns list of 4 categories`, () => expect(response.body.length).toBe(4));
+describe(`API refuses to create user if data is invalid`, () => {
+  const validUserData = {
+    name: `Сидор`,
+    surname: `Сидоров`,
+    email: `sidorov@example.com`,
+    password: `sidorov`,
+    passwordRepeated: `sidorov`,
+    avatar: `sidorov.jpg`,
+  };
 
-  test(`Categories are Животные, Журналы, Игры, IT`, () =>
-    expect(response.body.map((item) => item.name)).toEqual(
-        expect.arrayContaining([`Животные`, `Журналы`, `Игры`, `IT`]),
-    ));
+  let app;
 
+  beforeAll(async () => {
+    app = await createAPI();
+  });
+
+  test(`Without any required property response code is 400`, async () => {
+    for (const key of Object.keys(validUserData)) {
+      const badUserData = {...validUserData};
+      delete badUserData[key];
+      await request(app)
+        .post(`/user`)
+        .send(badUserData)
+        .expect(HttpCode.BAD_REQUEST);
+    }
+  });
+
+  test(`When field type is wrong response code is 400`, async () => {
+    const badUsers = [
+      {...validUserData, firstName: true},
+      {...validUserData, email: 1},
+    ];
+    for (const badUserData of badUsers) {
+      await request(app)
+        .post(`/user`)
+        .send(badUserData)
+        .expect(HttpCode.BAD_REQUEST);
+    }
+  });
+
+  test(`When field value is wrong response code is 400`, async () => {
+    const badUsers = [
+      {...validUserData, password: `short`, passwordRepeated: `short`},
+      {...validUserData, email: `invalid`},
+    ];
+    for (const badUserData of badUsers) {
+      await request(app)
+        .post(`/user`)
+        .send(badUserData)
+        .expect(HttpCode.BAD_REQUEST);
+    }
+  });
+
+  test(`When password and passwordRepeated are not equal, code is 400`, async () => {
+    const badUserData = {...validUserData, passwordRepeated: `not sidorov`};
+    await request(app)
+      .post(`/user`)
+      .send(badUserData)
+      .expect(HttpCode.BAD_REQUEST);
+  });
+
+  test(`When email is already in use status code is 400`, async () => {
+    const badUserData = {...validUserData, email: `ivanov@example.com`};
+    await request(app)
+      .post(`/user`)
+      .send(badUserData)
+      .expect(HttpCode.BAD_REQUEST);
+  });
 });
