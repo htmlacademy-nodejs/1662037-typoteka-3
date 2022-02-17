@@ -138,13 +138,15 @@ const mockArticles = [
 
 const mockUsers = [
   {
-    name: `Иван Иванов`,
+    name: `Иван`,
+    surname: `Иванов`,
     email: `ivanov@example.com`,
     passwordHash: passwordUtils.hashSync(`ivanov`),
     avatar: `avatar01.jpg`,
   },
   {
-    name: `Пётр Петров`,
+    name: `Пётр`,
+    surname: `Петров`,
     email: `petrov@example.com`,
     passwordHash: passwordUtils.hashSync(`petrov`),
     avatar: `avatar02.jpg`,

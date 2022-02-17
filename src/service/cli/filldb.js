@@ -108,25 +108,29 @@ module.exports = {
     const comments = await readFile(FILE_COMMENTS_PATH);
     const users = [
       {
-        name: `Иван Иванов`,
+        name: `Иван`,
+        surname: `Иванов`,
         email: `ivanov@example.com`,
         passwordHash: await passwordUtils.hash(`ivanov`),
         avatar: `avatar-1.png`,
       },
       {
-        name: `Пётр Петров`,
+        name: `Пётр`,
+        surname: `Петров`,
         email: `petrov@example.com`,
         passwordHash: await passwordUtils.hash(`petrov`),
         avatar: `avatar-2.png`,
       },
       {
-        name: `Семен Семенов`,
+        name: `Семен`,
+        surname: `Семенов`,
         email: `semon@example.com`,
         passwordHash: await passwordUtils.hash(`semonov`),
         avatar: `avatar-3.png`,
       },
       {
-        name: `Марина Яровицина`,
+        name: `Марина`,
+        surname: `Яровицина`,
         email: `marina@example.com`,
         passwordHash: await passwordUtils.hash(`yarovizina`),
         avatar: `avatar-4.png`,

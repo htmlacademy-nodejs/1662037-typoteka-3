@@ -32,6 +32,7 @@ mainRouter.post(`/register`, upload.single(`upload`), async (req, res) => {
   const userData = {
     avatar: file ? file.filename : ``,
     name: body.name,
+    surname: body.surname,
     email: body.email,
     password: body.password,
     passwordRepeated: body[`repeat-password`],

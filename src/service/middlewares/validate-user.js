@@ -5,6 +5,7 @@ const {HttpCode} = require(`../../const`);
 
 const ErrorRegisterMessage = {
   NAME: `Name shouldn't include special characters or numbers`,
+  SURNAME: `Surname shouldn't include special characters or numbers`,
   EMAIL: `Email is invalid`,
   EMAIL_EXIST: `Email is already registered`,
   PASSWORD: `Password should be at least 6 characters long`,
@@ -14,6 +15,12 @@ const ErrorRegisterMessage = {
 
 const schema = Joi.object({
   name: Joi.string()
+    .pattern(/[^0-9$&+,:;=?@#|'<>.^*()%!]+$/)
+    .required()
+    .messages({
+      'string.pattern.base': ErrorRegisterMessage.NAME,
+    }),
+  surname: Joi.string()
     .pattern(/[^0-9$&+,:;=?@#|'<>.^*()%!]+$/)
     .required()
     .messages({

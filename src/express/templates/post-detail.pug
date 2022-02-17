@@ -31,7 +31,7 @@ block content
                 img(src=`/img/${comment.users.avatar}` alt='аватар пользователя')
               .comments__text
                 .comments__head
-                  p #Username •
+                  p #{comment.users.name} #{comment.users.surname} •
                   time.comments__date(datetime=comment.createdAt) #{moment(article.createdAt).format('DD.MM.YYYY, HH:MM')}
                 p.comments__message #{comment.text}
           .comments__footer.comments__footer--user
