@@ -3,7 +3,6 @@
 const {Router} = require(`express`);
 const {getAPI} = require(`../api`);
 const upload = require(`../middlewares/upload`);
-const {UserRole} = require(`../../const`);
 
 const OFFERS_PER_PAGE = 8;
 
@@ -37,7 +36,6 @@ mainRouter.post(`/register`, upload.single(`upload`), async (req, res) => {
     email: body.email,
     password: body.password,
     passwordRepeated: body[`repeat-password`],
-    role: UserRole.USER,
   };
 
   try {

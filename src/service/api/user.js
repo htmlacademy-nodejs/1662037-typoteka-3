@@ -1,7 +1,7 @@
 'use strict';
 
 const {Router} = require(`express`);
-const {HttpCode} = require(`../../const`);
+const {HttpCode, UserRole} = require(`../../const`);
 const validateUser = require(`../middlewares/validate-user`);
 const {hash} = require(`../lib/password`);
 
@@ -12,6 +12,7 @@ module.exports = (app, userService) => {
   router.post(`/`, validateUser(userService), async (req, res) => {
     const userData = req.body;
     userData.passwordHash = await hash(userData.password);
+    userData.role = UserRole.USER;
 
     const newUser = await userService.create(userData);
     delete newUser.passwordHash;

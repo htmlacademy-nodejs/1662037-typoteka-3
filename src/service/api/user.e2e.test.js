@@ -175,7 +175,6 @@ describe(`API creates user if data is valid`, () => {
     password: `sidorov`,
     passwordRepeated: `sidorov`,
     avatar: `sidorov.jpg`,
-    role: UserRole.USER,
   };
 
   let response;
