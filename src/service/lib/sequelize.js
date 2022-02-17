@@ -25,5 +25,4 @@ module.exports = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
     acquire: 10000,
     idle: 10000,
   },
-  logging: false,
 });

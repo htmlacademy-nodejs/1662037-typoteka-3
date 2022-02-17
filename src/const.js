@@ -33,6 +33,11 @@ const HttpMethod = {
   DELETE: `DELETE`,
 };
 
+const UserRole = {
+  USER: `USER`,
+  ADMIN: `ADMIN`,
+};
+
 module.exports = {
   DEFAULT_COMMAND,
   USER_ARGV_INDEX,
@@ -41,4 +46,5 @@ module.exports = {
   HttpCode,
   HttpMethod,
   Env,
+  UserRole,
 };

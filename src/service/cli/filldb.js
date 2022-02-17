@@ -1,7 +1,7 @@
 'use strict';
 
 const fs = require(`fs`).promises;
-const {ExitCode} = require(`../../const`);
+const {ExitCode, UserRole} = require(`../../const`);
 const {getRandomInt, shuffle} = require(`../../utils`);
 const sequelize = require(`../lib/sequelize`);
 const initDB = require(`../lib/init-db`);
@@ -113,6 +113,7 @@ module.exports = {
         email: `ivanov@example.com`,
         passwordHash: await passwordUtils.hash(`ivanov`),
         avatar: `avatar-1.png`,
+        role: UserRole.ADMIN,
       },
       {
         name: `Пётр`,
@@ -120,6 +121,7 @@ module.exports = {
         email: `petrov@example.com`,
         passwordHash: await passwordUtils.hash(`petrov`),
         avatar: `avatar-2.png`,
+        role: UserRole.USER,
       },
       {
         name: `Семен`,
@@ -127,6 +129,7 @@ module.exports = {
         email: `semon@example.com`,
         passwordHash: await passwordUtils.hash(`semonov`),
         avatar: `avatar-3.png`,
+        role: UserRole.USER,
       },
       {
         name: `Марина`,
@@ -134,6 +137,7 @@ module.exports = {
         email: `marina@example.com`,
         passwordHash: await passwordUtils.hash(`yarovizina`),
         avatar: `avatar-4.png`,
+        role: UserRole.USER,
       },
     ];
 

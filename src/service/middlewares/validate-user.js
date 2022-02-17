@@ -1,7 +1,7 @@
 'use strict';
 
 const Joi = require(`joi`);
-const {HttpCode} = require(`../../const`);
+const {HttpCode, UserRole} = require(`../../const`);
 
 const ErrorRegisterMessage = {
   NAME: `Name shouldn't include special characters or numbers`,
@@ -42,6 +42,7 @@ const schema = Joi.object({
   avatar: Joi.string().required().messages({
     'string.empty': ErrorRegisterMessage.AVATAR,
   }),
+  role: Joi.string().valid(UserRole.USER).required(),
 });
 
 module.exports = (service) => async (req, res, next) => {

@@ -8,7 +8,7 @@ const initDB = require(`../lib/init-db`);
 const user = require(`./user`);
 const UserService = require(`../data-service/user`);
 const passwordUtils = require(`../lib/password`);
-const {HttpCode} = require(`../../const`);
+const {HttpCode, UserRole} = require(`../../const`);
 
 const mockUsers = [
   {
@@ -17,6 +17,7 @@ const mockUsers = [
     email: `ivanov@example.com`,
     passwordHash: passwordUtils.hashSync(`ivanov`),
     avatar: `avatar01.jpg`,
+    role: UserRole.ADMIN,
   },
   {
     name: `Пётр`,
@@ -24,6 +25,7 @@ const mockUsers = [
     email: `petrov@example.com`,
     passwordHash: passwordUtils.hashSync(`petrov`),
     avatar: `avatar02.jpg`,
+    role: UserRole.USER,
   },
 ];
 
@@ -173,6 +175,7 @@ describe(`API creates user if data is valid`, () => {
     password: `sidorov`,
     passwordRepeated: `sidorov`,
     avatar: `sidorov.jpg`,
+    role: UserRole.USER,
   };
 
   let response;

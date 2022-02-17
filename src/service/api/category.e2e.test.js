@@ -7,7 +7,7 @@ const Sequelize = require(`sequelize`);
 const initDB = require(`../lib/init-db`);
 const category = require(`./category`);
 const DataService = require(`../data-service/category`);
-const {HttpCode} = require(`../../const`);
+const {HttpCode, UserRole} = require(`../../const`);
 const passwordUtils = require(`../lib/password`);
 
 
@@ -143,6 +143,7 @@ const mockUsers = [
     email: `ivanov@example.com`,
     passwordHash: passwordUtils.hashSync(`ivanov`),
     avatar: `avatar01.jpg`,
+    role: UserRole.ADMIN,
   },
   {
     name: `Пётр`,
@@ -150,6 +151,7 @@ const mockUsers = [
     email: `petrov@example.com`,
     passwordHash: passwordUtils.hashSync(`petrov`),
     avatar: `avatar02.jpg`,
+    role: UserRole.USER,
   },
 ];
 

@@ -10,7 +10,7 @@ const ArticleService = require(`../data-service/article`);
 const CommentService = require(`../data-service/comment`);
 const passwordUtils = require(`../lib/password`);
 
-const {HttpCode} = require(`../../const`);
+const {HttpCode, UserRole} = require(`../../const`);
 
 const mockUsers = [
   {
@@ -19,6 +19,7 @@ const mockUsers = [
     email: `ivanov@example.com`,
     passwordHash: passwordUtils.hashSync(`ivanov`),
     avatar: `avatar01.jpg`,
+    role: UserRole.ADMIN,
   },
   {
     name: `Пётр`,
@@ -26,6 +27,7 @@ const mockUsers = [
     email: `petrov@example.com`,
     passwordHash: passwordUtils.hashSync(`petrov`),
     avatar: `avatar02.jpg`,
+    role: UserRole.USER,
   },
 ];
 
