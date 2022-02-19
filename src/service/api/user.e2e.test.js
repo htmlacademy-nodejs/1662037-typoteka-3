@@ -257,3 +257,53 @@ describe(`API refuses to create user if data is invalid`, () => {
       .expect(HttpCode.BAD_REQUEST);
   });
 });
+
+describe(`API authentificates user if data is valid`, () => {
+  const validUserData = {
+    email: `ivanov@example.com`,
+    password: `ivanov`,
+  };
+
+  let response;
+
+  beforeAll(async () => {
+    let app = await createAPI();
+    response = await request(app).post(`/user/auth`).send(validUserData);
+  });
+
+  test(`Status code 201`, () =>
+    expect(response.statusCode).toBe(HttpCode.OK));
+
+  test(`Valid user data returns`, () =>
+    expect(response.body.name).toBe(`Иван`));
+});
+
+describe(`API refuses to authentificates user if data is invalid`, () => {
+
+  let app;
+
+  beforeAll(async () => {
+    app = await createAPI();
+  });
+
+  test(`If email is incorrect, status is 401`, async () => {
+    const invalidUserData = {
+      email: `not-exist@example.com`,
+      password: `ivanov`,
+    };
+
+    await request(app).post(`/user/auth`).send(invalidUserData).expect(HttpCode.UNAUTHORIZED);
+  });
+
+  test(`If password is incorrect, status is 401`, async () => {
+    const invalidUserData = {
+      email: `ivanov@example.com`,
+      password: `not-a-password`,
+    };
+
+    await request(app)
+      .post(`/user/auth`)
+      .send(invalidUserData)
+      .expect(HttpCode.UNAUTHORIZED);
+  });
+});
