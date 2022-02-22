@@ -26,7 +26,6 @@ html(lang='ru')
     mixin insertErrorMessage(messages)
       if messages
         .form__validation-error
-          p.form__error-message Following errors occured:
           ul.form__errors
             for message of messages
               li.form__error

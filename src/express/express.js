@@ -3,6 +3,7 @@
 const express = require(`express`);
 const helmet = require(`helmet`);
 const path = require(`path`);
+const cookieParser = require('cookie-parser');
 const mainRoutes = require(`./routes/main-routes`);
 const articlesRoutes = require(`./routes/articles-routes`);
 const myRoutes = require(`./routes/my-routes`);
@@ -30,6 +31,8 @@ app.use(
       xssFilter: true,
     }),
 );
+
+app.use(cookieParser());
 
 app.use(`/`, mainRoutes);
 app.use(`/my`, myRoutes);

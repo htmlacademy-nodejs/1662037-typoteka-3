@@ -1,15 +1,19 @@
+/* eslint-disable no-undef */
 'use strict';
 
 const {Router} = require(`express`);
 const {getAPI} = require(`../api`);
 const upload = require(`../middlewares/upload`);
+const getUserAuth = require(`../middlewares/get-user-auth`);
 
 const OFFERS_PER_PAGE = 8;
 
 const mainRouter = new Router();
 const api = getAPI();
+const cookieOptions = {httpOnly: true, sameSite: true};
 
-mainRouter.get(`/`, async (req, res) => {
+mainRouter.get(`/`, getUserAuth, async (req, res) => {
+  const user = res.locals.user || {};
   let {page = 1} = req.query;
   page = +page;
 
@@ -23,10 +27,15 @@ mainRouter.get(`/`, async (req, res) => {
 
   const totalPages = Math.ceil(count / OFFERS_PER_PAGE);
 
-  res.render(`main`, {articles, page, totalPages, categories});
+  res.render(`main`, {articles, page, totalPages, categories, user});
 });
 
-mainRouter.get(`/register`, (req, res) => res.render(`sign-up`));
+mainRouter.get(`/register`, getUserAuth, async (req, res) => {
+  const user = res.locals.user || {};
+  console.log(`user:`, user);
+  return res.render(`sign-up`, {user});
+});
+
 mainRouter.post(`/register`, upload.single(`upload`), async (req, res) => {
   const {body, file} = req;
   const userData = {
@@ -48,7 +57,31 @@ mainRouter.post(`/register`, upload.single(`upload`), async (req, res) => {
 });
 
 mainRouter.get(`/login`, (req, res) => res.render(`login`));
-mainRouter.get(`/search`, async (req, res) => {
+mainRouter.post(`/login`, async (req, res) => {
+  try {
+    const {accessToken, refreshToken} = await api.auth(
+        req.body.email,
+        req.body.password,
+    );
+    res.cookie(`accessToken`, accessToken, cookieOptions);
+    res.cookie(`refreshToken`, refreshToken, cookieOptions);
+
+    res.redirect(`/`);
+  } catch (errors) {
+    const validationMessages = [errors.response.data];
+
+    res.render(`login`, {validationMessages});
+  }
+});
+
+mainRouter.get(`/logout`, (req, res) => {
+  res.clearCookie(`accessToken`);
+  res.clearCookie(`refreshToken`);
+  res.redirect(`/`);
+});
+
+mainRouter.get(`/search`, getUserAuth, async (req, res) => {
+  const user = res.locals.user || {};
   const {query} = req.query;
 
   if (!query) {
@@ -63,16 +96,18 @@ mainRouter.get(`/search`, async (req, res) => {
 
     return res.render(`search`, {
       results,
-      query
+      query,
+      user
     });
   } catch (error) {
     return res.render(`search`, {
       results: [],
       query,
+      user
     });
   }
 });
-mainRouter.get(`/categories`, (req, res) => res.render(`all-categories`));
-mainRouter.get(`/post-detail`, (req, res) => res.render(`post-detail`));
+mainRouter.get(`/categories`, getUserAuth, (req, res) => res.render(`all-categories`));
+mainRouter.get(`/post-detail`, getUserAuth, (req, res) => res.render(`post-detail`));
 
 module.exports = mainRouter;

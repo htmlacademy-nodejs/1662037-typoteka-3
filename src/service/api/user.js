@@ -3,14 +3,11 @@
 const {Router} = require(`express`);
 const {HttpCode, UserRole} = require(`../../const`);
 const validateUser = require(`../middlewares/validate-user`);
-const {hash, compare} = require(`../lib/password`);
+const authUser = require(`../middlewares/auth-user`);
+const {makeTokens, verifyRefreshToken} = require(`../lib/jwt-helper`);
+const {hash} = require(`../lib/password`);
 
-const ErrorAuthMessage = {
-  EMAIL: `Email not found`,
-  PASSWORD: `Password is incorrect`,
-};
-
-module.exports = (app, userService) => {
+module.exports = (app, userService, refreshTokenService) => {
   const router = new Router();
   app.use(`/user`, router);
 
@@ -25,23 +22,40 @@ module.exports = (app, userService) => {
     return res.status(HttpCode.CREATED).json(newUser);
   });
 
-  router.post(`/auth`, async (req, res) => {
-    const {email, password} = req.body;
+  router.post(`/auth`, authUser(userService), async (req, res) => {
+    const {user} = res.locals;
 
-    const user = await userService.findByEmail(email);
+    const {accessToken, refreshToken} = makeTokens(user);
+    await refreshTokenService.add(refreshToken);
 
-    if (!user) {
-      return res.status(HttpCode.UNAUTHORIZED).send(ErrorAuthMessage.EMAIL);
+    return res.json({accessToken, refreshToken});
+  });
+
+  router.post(`/refresh`, async (req, res) => {
+    const {token} = req.body;
+
+    if (!token) {
+      return res.sendStatus(HttpCode.BAD_REQUEST);
     }
 
-    const isPasswordValid = await compare(password, user.passwordHash);
+    const existantToken = await refreshTokenService.find(token);
 
-    if (!isPasswordValid) {
-      return res.status(HttpCode.UNAUTHORIZED).send(ErrorAuthMessage.PASSWORD);
+    if (!existantToken) {
+      return res.sendStatus(HttpCode.NOT_FOUND);
     }
 
-    delete user.passwordHash;
-    return res.status(HttpCode.OK).json(user);
+    const userInfo = verifyRefreshToken(token);
+
+    if (!userInfo) {
+      return res.sendStatus(HttpCode.FORBIDDEN);
+    }
+
+    const {accessToken: newAccessToken, refreshToken: newRefreshToken} = makeTokens(userInfo);
+
+    await refreshTokenService.drop(existantToken);
+    await refreshTokenService.add(newRefreshToken);
+
+    return res.json({newAccessToken, newRefreshToken});
   });
 
 

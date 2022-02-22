@@ -1,7 +1,7 @@
 'use strict';
 
 const {Router} = require(`express`);
-const {CategoryService, ArticlesService, SearchService, CommentService, UserService} = require(`../data-service`);
+const {CategoryService, ArticlesService, SearchService, CommentService, UserService, RefreshTokenService} = require(`../data-service`);
 const defineModels = require(`../models`);
 const sequelize = require(`../lib/sequelize`);
 const registerCategoryRoutes = require(`./category`);
@@ -20,7 +20,7 @@ defineModels(sequelize);
       new CommentService(sequelize),
   );
   registerSearchService(apiRouter, new SearchService(sequelize));
-  registerUserRoutes(apiRouter, new UserService(sequelize));
+  registerUserRoutes(apiRouter, new UserService(sequelize), new RefreshTokenService(sequelize));
 })();
 
 module.exports = apiRouter;

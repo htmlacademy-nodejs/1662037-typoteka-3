@@ -59,10 +59,24 @@ class API {
     });
   }
 
-  createUser(data) {
+  async createUser(data) {
     return this._load(`/user`, {
       method: HttpMethod.POST,
       data,
+    });
+  }
+
+  async auth(email, password) {
+    return this._load(`/user/auth`, {
+      method: HttpMethod.POST,
+      data: {email, password},
+    });
+  }
+
+  async refresh(token) {
+    return this._load(`/user/refresh`, {
+      method: HttpMethod.POST,
+      data: {token},
     });
   }
 }
