@@ -1,4 +1,4 @@
-extends ../layout.pug
+extends layout.pug
 
 
 block content
@@ -7,7 +7,7 @@ block content
     section
       .popup.popup--new-publication.popup--anti
         .new-publication
-          form(action=`/articles/edit/${id}` method='post' enctype="multipart/form-data")
+          form(action='/articles/add' method='post' enctype="multipart/form-data")
             .new-publication__header
               h1 Новая публикация
               .new-publication__date-form
@@ -24,11 +24,12 @@ block content
             .new-publication__form.form
               .form__wrapper.form__wrapper--intro
                 .form__field
+                  input(type="hidden" name="_csrf" value=csrfToken)
                   label
                     input(type='text' name='title' placeholder='Заголовок' value=article.title required='')
                 .form__field.form__field--post-image
                   label
-                    input#image-name-field(type='text' name='photo' placeholder=`${article.picture ? article.picture : `Фотография`}` readonly=''  value=`${article.picture ? article.picture : ``}`)
+                    input#image-name-field(type='text' name='photo' placeholder='Фотография' readonly='')
                   .form__image-loader.form__image-loader--publication
                     label
                       input.visually-hidden(type='file' name='upload')
@@ -45,6 +46,5 @@ block content
                     textarea(rows='5' name='announcement' placeholder='Анонс публикации' value=article.announce) #{article.announce}
                 .form__field.form__field--publication-text
                   label
-                    textarea(rows='10' name='full-text' placeholder='Полный текст публикации')
-                      | #{article.fullText}
+                    textarea(rows='10' name='full-text' placeholder='Полный текст публикации' value=article.fullText)
 

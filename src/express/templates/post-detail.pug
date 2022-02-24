@@ -9,7 +9,7 @@ block content
         h2.visually-hidden Основное содержание
         .post__wrapper
           .post__head
-            a.post__backwards.button.button--backwards(href='#') Назад
+            a.post__backwards.button.button--backwards(href='/') Назад
             time.post__date(datetime=article.createdAt) #{moment(article.createdAt).format('DD.MM.YYYY, HH:MM')}
             h2.post__title.title.title--main #{article.title}
             ul.post__themes.themes
@@ -36,8 +36,9 @@ block content
                 p.comments__message #{comment.text}
           .comments__footer.comments__footer--user
             form(action=`/articles/${id}/comments` method='POST' enctype="application/x-www-form-urlencoded")
+              input(type="hidden" name="_csrf" value=csrfToken)
               .comments__avatar.avatar
-                img(src='/img/avatar-2.png' alt='аватар пользователя')
+                img(src=`/img/${user.avatar}` alt='аватар пользователя')
               label
                 textarea(rows='1' name='comment' placeholder='Присоединиться к обсуждению')
                   | #{comment}

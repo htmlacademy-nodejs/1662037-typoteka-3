@@ -59,10 +59,38 @@ class API {
     });
   }
 
-  createUser(data) {
+  async createUser(data) {
     return this._load(`/user`, {
       method: HttpMethod.POST,
       data,
+    });
+  }
+
+  async auth(email, password) {
+    return this._load(`/user/auth`, {
+      method: HttpMethod.POST,
+      data: {email, password},
+    });
+  }
+
+  async refresh(token) {
+    return this._load(`/user/refresh`, {
+      method: HttpMethod.POST,
+      data: {token},
+    });
+  }
+
+  async logout(refreshToken) {
+    return this._load(`/user/logout`, {
+      method: HttpMethod.POST,
+      data: {refreshToken},
+    });
+  }
+
+  async checkAdmin(email) {
+    return this._load(`/user/admin`, {
+      method: HttpMethod.POST,
+      data: {email},
     });
   }
 }
