@@ -91,7 +91,5 @@ module.exports = (app, userService, refreshTokenService) => {
 
     return res.sendStatus(HttpCode.OK);
   });
-
-
 };
 

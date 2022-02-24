@@ -1,6 +1,7 @@
 'use strict';
 
 const {Router} = require(`express`);
+const csrf = require(`csurf`);
 const upload = require(`../middlewares/upload`);
 const checkAuth = require(`../middlewares/check-auth`);
 const getUserAuth = require(`../middlewares/get-user-auth`);
@@ -10,6 +11,7 @@ const {HttpCode} = require(`../../const`);
 
 const articlesRouter = new Router();
 const api = getAPI();
+const csrfProtection = csrf({cookie: {httpOnly: true, sameSite: true}});
 
 const assembleCategories = (formData) => {
   const keys = Object.keys(formData);
@@ -18,14 +20,15 @@ const assembleCategories = (formData) => {
     .map((item) => Number(item.split(`-`).pop()));
 };
 
-articlesRouter.get(`/add`, getUserAuth, checkAuth, async (req, res) => {
+articlesRouter.get(`/add`, getUserAuth, checkAuth, csrfProtection, async (req, res) => {
   const {user} = res.locals;
   const categories = await api.getCategories();
-  res.render(`admin/post`, {article: {}, categories, user});
-});
-
-articlesRouter.get(`/category/:id`, (req, res) => {
-  res.send(`/articles/category/:id`);
+  res.render(`post`, {
+    article: {},
+    categories,
+    user,
+    csrfToken: req.csrfToken(),
+  });
 });
 
 articlesRouter.post(
@@ -33,6 +36,7 @@ articlesRouter.post(
     getUserAuth,
     checkAuth,
     upload.single(`upload`),
+    csrfProtection,
     async (req, res) => {
       const {body, file} = req;
       const {user} = res.locals;
@@ -52,7 +56,7 @@ articlesRouter.post(
       } catch (errors) {
         const categories = await api.getCategories();
         const validationMessages = errors.response.data;
-        res.render(`admin/post`, {
+        res.render(`post`, {
           article: articleData,
           categories,
           validationMessages,
@@ -61,7 +65,7 @@ articlesRouter.post(
     },
 );
 
-articlesRouter.get(`/edit/:id`, getUserAuth, checkAuth, async (req, res) => {
+articlesRouter.get(`/edit/:id`, getUserAuth, checkAuth, csrfProtection, async (req, res) => {
   const {user} = res.locals;
   const {id} = req.params;
   try {
@@ -69,7 +73,13 @@ articlesRouter.get(`/edit/:id`, getUserAuth, checkAuth, async (req, res) => {
       api.getArticle(id),
       api.getCategories(),
     ]);
-    return res.render(`admin/post-edit`, {id, article, categories, user});
+    return res.render(`post-edit`, {
+      id,
+      article,
+      categories,
+      user,
+      csrfToken: req.csrfToken(),
+    });
   } catch (error) {
     return res.status(HttpCode.NOT_FOUND).render(`errors/404`);
   }
@@ -80,6 +90,7 @@ articlesRouter.post(
     getUserAuth,
     checkAuth,
     upload.single(`upload`),
+    csrfProtection,
     async (req, res) => {
       const {body, file} = req;
       const {id} = req.params;
@@ -100,7 +111,7 @@ articlesRouter.post(
       } catch (errors) {
         const categories = await api.getCategories();
         const validationMessages = errors.response.data;
-        res.render(`admin/post-edit`, {
+        res.render(`post-edit`, {
           article: articleData,
           categories,
           validationMessages,
@@ -110,18 +121,27 @@ articlesRouter.post(
     },
 );
 
+articlesRouter.get(`/category/:id`, (req, res) => {
+  res.send(`/articles/category/:id`);
+});
+
 articlesRouter.get(`/articles-by-category`, getUserAuth, (req, res) => {
   const user = res.locals.user || {};
   res.render(`articles-by-category`, {user});
 });
 
-articlesRouter.get(`/:id`, getUserAuth, async (req, res) => {
+articlesRouter.get(`/:id`, getUserAuth, csrfProtection, async (req, res) => {
   const user = res.locals.user || {};
   const {id} = req.params;
 
   try {
     const article = await api.getArticle(id);
-    return res.render(`post-detail`, {id, article, user});
+    return res.render(`post-detail`, {
+      id,
+      article,
+      user,
+      csrfToken: req.csrfToken(),
+    });
   } catch (error) {
     return res.status(HttpCode.NOT_FOUND).render(`errors/404`);
   }
@@ -131,6 +151,7 @@ articlesRouter.post(
     `/:id/comments`,
     getUserAuth,
     checkAuth,
+    csrfProtection,
     async (req, res) => {
       const {id} = req.params;
       const {comment} = req.body;
