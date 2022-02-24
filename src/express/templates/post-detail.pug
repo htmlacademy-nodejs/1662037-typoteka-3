@@ -37,7 +37,7 @@ block content
           .comments__footer.comments__footer--user
             form(action=`/articles/${id}/comments` method='POST' enctype="application/x-www-form-urlencoded")
               .comments__avatar.avatar
-                img(src='/img/avatar-2.png' alt='аватар пользователя')
+                img(src=`/img/${user.avatar}` alt='аватар пользователя')
               label
                 textarea(rows='1' name='comment' placeholder='Присоединиться к обсуждению')
                   | #{comment}

@@ -79,6 +79,20 @@ class API {
       data: {token},
     });
   }
+
+  async logout(refreshToken) {
+    return this._load(`/user/logout`, {
+      method: HttpMethod.POST,
+      data: {refreshToken},
+    });
+  }
+
+  async checkAdmin(email) {
+    return this._load(`/user/admin`, {
+      method: HttpMethod.POST,
+      data: {email},
+    });
+  }
 }
 
 const defaultAPI = new API(defaultUrl, TIMEOUT);

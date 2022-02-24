@@ -58,6 +58,40 @@ module.exports = (app, userService, refreshTokenService) => {
     return res.json({newAccessToken, newRefreshToken});
   });
 
+  router.post(`/logout`, async (req, res) => {
+    const {refreshToken} = req.body;
+
+    if (!refreshToken) {
+      return res.sendStatus(HttpCode.BAD_REQUEST);
+    }
+
+    const existantToken = await refreshTokenService.find(refreshToken);
+
+    if (!existantToken) {
+      return res.sendStatus(HttpCode.NOT_FOUND);
+    }
+
+    await refreshTokenService.drop(existantToken);
+
+    return res.sendStatus(HttpCode.OK);
+  });
+
+  router.post(`/admin`, async (req, res) => {
+    const {email} = req.body;
+
+    const user = await userService.findByEmail(email);
+
+    if (!user) {
+      return res.sendStatus(HttpCode.NOT_FOUND);
+    }
+
+    if (user.role !== UserRole.ADMIN) {
+      return res.sendStatus(HttpCode.FORBIDDEN);
+    }
+
+    return res.sendStatus(HttpCode.OK);
+  });
+
 
 };
 

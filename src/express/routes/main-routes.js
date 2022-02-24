@@ -10,7 +10,11 @@ const OFFERS_PER_PAGE = 8;
 
 const mainRouter = new Router();
 const api = getAPI();
-const cookieOptions = {httpOnly: true, sameSite: true};
+const cookieOptions = {
+  httpOnly: true,
+  sameSite: true,
+  maxAge: 1000 * 60 * 60 * 24,
+};
 
 mainRouter.get(`/`, getUserAuth, async (req, res) => {
   const user = res.locals.user || {};
@@ -31,9 +35,13 @@ mainRouter.get(`/`, getUserAuth, async (req, res) => {
 });
 
 mainRouter.get(`/register`, getUserAuth, async (req, res) => {
-  const user = res.locals.user || {};
-  console.log(`user:`, user);
-  return res.render(`sign-up`, {user});
+  const {user} = res.locals;
+
+  if (user) {
+    return res.redirect(`/`);
+  }
+
+  return res.render(`sign-up`);
 });
 
 mainRouter.post(`/register`, upload.single(`upload`), async (req, res) => {
@@ -74,10 +82,18 @@ mainRouter.post(`/login`, async (req, res) => {
   }
 });
 
-mainRouter.get(`/logout`, (req, res) => {
-  res.clearCookie(`accessToken`);
-  res.clearCookie(`refreshToken`);
-  res.redirect(`/`);
+mainRouter.get(`/logout`, async (req, res) => {
+  const {refreshToken} = req.cookies;
+
+  try {
+    await api.logout(refreshToken);
+  // eslint-disable-next-line no-empty
+  } catch (_err) {
+  } finally {
+    res.clearCookie(`accessToken`);
+    res.clearCookie(`refreshToken`);
+    res.redirect(`/`);
+  }
 });
 
 mainRouter.get(`/search`, getUserAuth, async (req, res) => {

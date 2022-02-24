@@ -7,7 +7,12 @@ module.exports = async (req, res, next) => {
   let user = null;
   const api = getAPI();
 
-  const cookieOptions = {httpOnly: true, sameSite: true};
+  const cookieOptions = {
+    httpOnly: true,
+    sameSite: true,
+    maxAge: 1000 * 60 * 60 * 24,
+  };
+
   const {accessToken, refreshToken} = req.cookies;
 
   if (!accessToken && !refreshToken) {

@@ -19,7 +19,7 @@ const assembleCategories = (formData) => {
 };
 
 articlesRouter.get(`/add`, getUserAuth, checkAuth, async (req, res) => {
-  const user = res.locals.user || {};
+  const {user} = res.locals;
   const categories = await api.getCategories();
   res.render(`admin/post`, {article: {}, categories, user});
 });
@@ -30,13 +30,12 @@ articlesRouter.get(`/category/:id`, (req, res) => {
 
 articlesRouter.post(
     `/add`,
+    getUserAuth,
     checkAuth,
     upload.single(`upload`),
     async (req, res) => {
       const {body, file} = req;
       const {user} = res.locals;
-
-      console.log();
 
       const articleData = {
         picture: file ? file.filename : ``,
@@ -62,8 +61,8 @@ articlesRouter.post(
     },
 );
 
-articlesRouter.get(`/edit/:id`, getUserAuth, async (req, res) => {
-  const user = res.locals.user || {};
+articlesRouter.get(`/edit/:id`, getUserAuth, checkAuth, async (req, res) => {
+  const {user} = res.locals;
   const {id} = req.params;
   try {
     const [article, categories] = await Promise.all([
@@ -76,32 +75,42 @@ articlesRouter.get(`/edit/:id`, getUserAuth, async (req, res) => {
   }
 });
 
-articlesRouter.post(`/edit/:id`, upload.single(`upload`), async (req, res) => {
-  const {body, file} = req;
-  const {id} = req.params;
-  const articleData = {
-    picture: file ? file.filename : body.photo,
-    title: body.title,
-    fullText: body[`full-text`],
-    announce: body.announcement,
-    categories: assembleCategories(body),
-  };
+articlesRouter.post(
+    `/edit/:id`,
+    getUserAuth,
+    checkAuth,
+    upload.single(`upload`),
+    async (req, res) => {
+      const {body, file} = req;
+      const {id} = req.params;
+      const {user} = res.locals;
 
-  try {
-    await api.editArticle(id, articleData);
-    res.redirect(`/articles/${id}`);
-  } catch (errors) {
-    const categories = await api.getCategories();
-    const validationMessages = errors.response.data;
-    res.render(`admin/post-edit`, {
-      article: articleData,
-      categories,
-      validationMessages,
-    });
-  }
-});
+      const articleData = {
+        picture: file ? file.filename : body.photo,
+        title: body.title,
+        fullText: body[`full-text`],
+        announce: body.announcement,
+        categories: assembleCategories(body),
+        userId: user.id,
+      };
 
-articlesRouter.get(`/articles-by-category`, (req, res) => {
+      try {
+        await api.editArticle(id, articleData);
+        res.redirect(`/articles/${id}`);
+      } catch (errors) {
+        const categories = await api.getCategories();
+        const validationMessages = errors.response.data;
+        res.render(`admin/post-edit`, {
+          article: articleData,
+          categories,
+          validationMessages,
+          user
+        });
+      }
+    },
+);
+
+articlesRouter.get(`/articles-by-category`, getUserAuth, (req, res) => {
   const user = res.locals.user || {};
   res.render(`articles-by-category`, {user});
 });
@@ -118,19 +127,24 @@ articlesRouter.get(`/:id`, getUserAuth, async (req, res) => {
   }
 });
 
-articlesRouter.post(`/:id/comments`, checkAuth, async (req, res) => {
-  const {id} = req.params;
-  const {comment} = req.body;
-  const {user} = res.locals;
+articlesRouter.post(
+    `/:id/comments`,
+    getUserAuth,
+    checkAuth,
+    async (req, res) => {
+      const {id} = req.params;
+      const {comment} = req.body;
+      const {user} = res.locals;
 
-  try {
-    await api.createComment(id, {text: comment, userId: user.id});
-    res.redirect(`/articles/${id}`);
-  } catch (errors) {
-    const validationMessages = errors.response.data;
-    const article = await api.getArticle(id);
-    res.render(`post-detail`, {article, id, comment, validationMessages});
-  }
-});
+      try {
+        await api.createComment(id, {text: comment, userId: user.id});
+        res.redirect(`/articles/${id}`);
+      } catch (errors) {
+        const validationMessages = errors.response.data;
+        const article = await api.getArticle(id);
+        res.render(`post-detail`, {article, id, comment, validationMessages, user});
+      }
+    },
+);
 
 module.exports = articlesRouter;
