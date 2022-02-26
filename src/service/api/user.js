@@ -32,19 +32,19 @@ module.exports = (app, userService, refreshTokenService) => {
   });
 
   router.post(`/refresh`, async (req, res) => {
-    const {token} = req.body;
+    const {refreshToken} = req.body;
 
-    if (!token) {
+    if (!refreshToken) {
       return res.sendStatus(HttpCode.BAD_REQUEST);
     }
 
-    const existantToken = await refreshTokenService.find(token);
+    const existantToken = await refreshTokenService.find(refreshToken);
 
     if (!existantToken) {
       return res.sendStatus(HttpCode.NOT_FOUND);
     }
 
-    const userInfo = verifyRefreshToken(token);
+    const userInfo = verifyRefreshToken(refreshToken);
 
     if (!userInfo) {
       return res.sendStatus(HttpCode.FORBIDDEN);
@@ -78,6 +78,10 @@ module.exports = (app, userService, refreshTokenService) => {
 
   router.post(`/admin`, async (req, res) => {
     const {email} = req.body;
+
+    if (!email) {
+      return res.sendStatus(HttpCode.BAD_REQUEST);
+    }
 
     const user = await userService.findByEmail(email);
 

@@ -7,6 +7,7 @@ const Sequelize = require(`sequelize`);
 const initDB = require(`../lib/init-db`);
 const user = require(`./user`);
 const UserService = require(`../data-service/user`);
+const RefreshTokenService = require(`../data-service/refresh-token`);
 const passwordUtils = require(`../lib/password`);
 const {HttpCode, UserRole} = require(`../../const`);
 
@@ -163,7 +164,7 @@ const createAPI = async () => {
   });
   const app = express();
   app.use(express.json());
-  user(app, new UserService(mockDB));
+  user(app, new UserService(mockDB), new RefreshTokenService(mockDB));
   return app;
 };
 
@@ -258,7 +259,7 @@ describe(`API refuses to create user if data is invalid`, () => {
   });
 });
 
-describe(`API authentificates user if data is valid`, () => {
+describe(`API authentificates user if data is valid and returns access and refresh tokens`, () => {
   const validUserData = {
     email: `ivanov@example.com`,
     password: `ivanov`,
@@ -271,15 +272,16 @@ describe(`API authentificates user if data is valid`, () => {
     response = await request(app).post(`/user/auth`).send(validUserData);
   });
 
-  test(`Status code 201`, () =>
-    expect(response.statusCode).toBe(HttpCode.OK));
+  test(`Status code 201`, () => expect(response.statusCode).toBe(HttpCode.OK));
 
-  test(`Valid user data returns`, () =>
-    expect(response.body.name).toBe(`Иван`));
+  test(`Access token exists`, () =>
+    expect(response.body.accessToken).toBeDefined());
+
+  test(`Refresh token exists`, () =>
+    expect(response.body.refreshToken).toBeDefined());
 });
 
 describe(`API refuses to authentificates user if data is invalid`, () => {
-
   let app;
 
   beforeAll(async () => {
@@ -292,7 +294,10 @@ describe(`API refuses to authentificates user if data is invalid`, () => {
       password: `ivanov`,
     };
 
-    await request(app).post(`/user/auth`).send(invalidUserData).expect(HttpCode.UNAUTHORIZED);
+    await request(app)
+      .post(`/user/auth`)
+      .send(invalidUserData)
+      .expect(HttpCode.UNAUTHORIZED);
   });
 
   test(`If password is incorrect, status is 401`, async () => {
@@ -305,5 +310,135 @@ describe(`API refuses to authentificates user if data is invalid`, () => {
       .post(`/user/auth`)
       .send(invalidUserData)
       .expect(HttpCode.UNAUTHORIZED);
+  });
+});
+
+describe(`API returns new access token on /refresh`, () => {
+  const validUserData = {
+    email: `ivanov@example.com`,
+    password: `ivanov`,
+  };
+
+  let response;
+
+  beforeAll(async () => {
+    let app = await createAPI();
+    const authResponse = await request(app)
+      .post(`/user/auth`)
+      .send(validUserData);
+    const refreshToken = authResponse.body.refreshToken;
+    response = await request(app)
+      .post(`/user/refresh`)
+      .send({refreshToken});
+  });
+
+  test(`Status code 201`, () => expect(response.statusCode).toBe(HttpCode.OK));
+
+  test(`New access token exists`, () =>
+    expect(response.body.newAccessToken).toBeDefined());
+
+  test(`New refresh token exists`, () =>
+    expect(response.body.newRefreshToken).toBeDefined());
+});
+
+describe(`API doesn't return new access token on /refresh`, () => {
+  let app;
+
+  beforeAll(async () => {
+    app = await createAPI();
+  });
+
+  test(`If refresh token hasn't been sent`, async () => {
+    await request(app)
+      .post(`/user/refresh`)
+      .send({})
+      .expect(HttpCode.BAD_REQUEST);
+  });
+
+
+  test(`If refresh token is invalid`, async () => {
+    await request(app)
+      .post(`/user/refresh`)
+      .send({refreshToken: `not-a-valid-refresh-token`})
+      .expect(HttpCode.NOT_FOUND);
+  });
+});
+
+test(`API returns 200 on /logout with correct refreshToken`, async () => {
+  const validUserData = {
+    email: `ivanov@example.com`,
+    password: `ivanov`,
+  };
+
+  const app = await createAPI();
+
+  const authResponse = await request(app)
+  .post(`/user/auth`)
+  .send(validUserData);
+
+  const refreshToken = authResponse.body.refreshToken;
+
+  await request(app)
+    .post(`/user/logout`)
+    .send({refreshToken})
+    .expect(HttpCode.OK);
+});
+
+describe(`API doesn't /logout`, () => {
+  let app;
+
+  beforeAll(async () => {
+    app = await createAPI();
+  });
+
+  test(`If refresh token hasn't been sent`, async () => {
+    await request(app)
+      .post(`/user/logout`)
+      .send({})
+      .expect(HttpCode.BAD_REQUEST);
+  });
+
+  test(`If refresh token is invalid`, async () => {
+    await request(app)
+      .post(`/user/logout`)
+      .send({refreshToken: `not-a-valid-refresh-token`})
+      .expect(HttpCode.NOT_FOUND);
+  });
+});
+
+describe(`API on /admin`, () => {
+  const adminUserData = {
+    email: `ivanov@example.com`,
+  };
+
+  const regularUserData = {
+    email: `petrov@example.com`,
+  };
+
+  let app;
+
+  beforeAll(async () => {
+    app = await createAPI();
+  });
+
+  test(`Returns 200 if user is Admin`, async () => {
+    await request(app)
+      .post(`/user/admin`)
+      .send(adminUserData)
+      .expect(HttpCode.OK);
+  });
+
+  test(`Returns 403 if user is not Admin`, async () => {
+    await request(app)
+      .post(`/user/admin`)
+      .send(regularUserData)
+      .expect(HttpCode.FORBIDDEN);
+  });
+
+  test(`Returns 400 if user data is not sent`, async () => {
+    await request(app)
+      .post(`/user/admin`)
+      .send({})
+      .expect(HttpCode.BAD_REQUEST);
   });
 });

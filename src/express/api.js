@@ -73,10 +73,10 @@ class API {
     });
   }
 
-  async refresh(token) {
+  async refresh(refreshToken) {
     return this._load(`/user/refresh`, {
       method: HttpMethod.POST,
-      data: {token},
+      data: {refreshToken},
     });
   }
 

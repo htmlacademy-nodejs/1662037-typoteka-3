@@ -2,6 +2,7 @@
 
 const {getAPI} = require(`../api`);
 const verifyAccessToken = require(`../lib/jwt-helper`);
+const {JWT_COOKIE_MAXAGE} = process.env;
 
 module.exports = async (req, res, next) => {
   let user = null;
@@ -10,7 +11,7 @@ module.exports = async (req, res, next) => {
   const cookieOptions = {
     httpOnly: true,
     sameSite: true,
-    maxAge: 1000 * 60 * 60 * 24,
+    maxAge: JWT_COOKIE_MAXAGE,
   };
 
   const {accessToken, refreshToken} = req.cookies;
