@@ -1,11 +1,12 @@
 'use strict';
 
 const jwt = require(`jsonwebtoken`);
-const {JWT_ACCESS_SECRET, JWT_REFRESH_SECRET} = process.env;
+const {JWT_ACCESS_SECRET, JWT_REFRESH_SECRET, JWT_ACCESS_TOKEN_EXPIRE_TIME} =
+  process.env;
 
 const makeTokens = (tokenData) => {
   const accessToken = jwt.sign(tokenData, JWT_ACCESS_SECRET, {
-    expiresIn: `25s`,
+    expiresIn: JWT_ACCESS_TOKEN_EXPIRE_TIME,
   });
   const refreshToken = jwt.sign(tokenData, JWT_REFRESH_SECRET);
   return {accessToken, refreshToken};

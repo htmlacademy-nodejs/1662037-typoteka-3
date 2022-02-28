@@ -1,0 +1,6 @@
+'use strict';
+
+process.env.JWT_ACCESS_SECRET = 432324;
+process.env.JWT_REFRESH_SECRET = 324234;
+process.env.JWT_ACCESS_TOKEN_EXPIRE_TIME = 36000;
+process.env.JWT_COOKIE_MAXAGE = 86400000;
