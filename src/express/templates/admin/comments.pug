@@ -8,12 +8,12 @@ block content
         each comment of comments
           li.publication__list-item
             .publication__header
-              img.publication__list-image(src=comment.users.avatar width='20' height='20' alt='Аватар пользователя')
+              img.publication__list-image(src=`/img/${comment.users.avatar}` width='20' height='20' alt='Аватар пользователя')
               b.publication__list-name #{comment.users.name} #{comment.users.surname}
               time.publication__item-time(datetime=comment.createdAt) #{moment(comment.createdAt).format('DD.MM.YYYY, HH:MM')}
-            a.publication__item-text(href='#') #{comment.text}
-            p.publication__text-strong
-              #{comment.id}
-            button.publication__button.button.button--close-item(type='button')
-              span.visually-hidden Закрыть строку списка
+            p.publication__item-text #{comment.text}
+            a.publication__text-strong(href=`/articles/${comment.articleId}`) #{getArticleTitle(articles, comment.articleId)}
+            form(method='POST' action=`/articles/${comment.articleId}/comments/delete/${comment.id}`)
+              button.publication__button.button.button--close-item(type='submit')
+                span.visually-hidden Закрыть строку списка
 

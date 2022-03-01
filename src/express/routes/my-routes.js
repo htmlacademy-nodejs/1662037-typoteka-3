@@ -19,7 +19,7 @@ myRouter.get(`/comments`, getUserAuth, checkAuth, checkAdmin, async (req, res) =
 
   const articles = await api.getArticles({comments: true});
   const comments = articles.flatMap((article) => article.comments);
-  res.render(`admin/comments`, {comments, user});
+  res.render(`admin/comments`, {articles, comments, user});
 });
 myRouter.get(`/post`, getUserAuth, checkAuth, checkAdmin, (req, res) => {
   const {user} = res.locals;

@@ -5,6 +5,7 @@ const csrf = require(`csurf`);
 const upload = require(`../middlewares/upload`);
 const checkAuth = require(`../middlewares/check-auth`);
 const getUserAuth = require(`../middlewares/get-user-auth`);
+const checkAdmin = require(`../middlewares/check-admin`);
 
 const {getAPI} = require(`../api`);
 const {HttpCode} = require(`../../const`);
@@ -23,7 +24,7 @@ const assembleCategories = (formData) => {
 articlesRouter.get(`/add`, getUserAuth, checkAuth, csrfProtection, async (req, res) => {
   const {user} = res.locals;
   const categories = await api.getCategories();
-  res.render(`post`, {
+  res.render(`new-post`, {
     article: {},
     categories,
     user,
@@ -56,7 +57,7 @@ articlesRouter.post(
       } catch (errors) {
         const categories = await api.getCategories();
         const validationMessages = errors.response.data;
-        res.render(`post`, {
+        res.render(`new-post`, {
           article: articleData,
           categories,
           validationMessages,
@@ -164,6 +165,26 @@ articlesRouter.post(
         const validationMessages = errors.response.data;
         const article = await api.getArticle(id);
         res.render(`post-detail`, {article, id, comment, validationMessages, user});
+      }
+    },
+);
+
+articlesRouter.post(
+    `/:id/comments/delete/:commentId`,
+    getUserAuth,
+    checkAuth,
+    checkAdmin,
+    async (req, res) => {
+      const {id: articleId, commentId} = req.params;
+
+      try {
+        await api.deleteComment({
+          articleId,
+          commentId,
+        });
+        res.redirect(`/my/comments`);
+      } catch (errors) {
+        res.redirect(`/my/comments`);
       }
     },
 );

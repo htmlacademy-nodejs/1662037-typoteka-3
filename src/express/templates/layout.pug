@@ -23,6 +23,8 @@ html(lang='ru')
     -
       const isChecked = (article, {id}) => article.categories && article.categories.some(item => item === id || item.id === id);
 
+      const getArticleTitle = (articles, id) => articles.filter(article => article.id === id)[0].title;
+
     mixin insertErrorMessage(messages)
       if messages
         .form__validation-error

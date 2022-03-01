@@ -18,29 +18,25 @@ block content
                 a.themes__item-link(href='#') #{category.name}
                   sup 88
                 button.themes__remove-btn(type='button') Удалить категорию
-            .post__picture
-              img(src=`/img/${article.picture}` alt='пейзаж море, скалы, пляж')
+            if (article.picture)
+              .post__picture
+                img(src=`/img/${article.picture}` alt='Post picture')
           .post__text #{article.fullText}
       .post__wrapper.post__wrapper--comments
         section.post__comments.comments
-          h2.comments__title.title.title--middle Комментарии
-          ul.comments__list
-            each comment in article.comments
-              li.comments__comment
-              .comments__avatar.avatar
-                img(src=`/img/${comment.users.avatar}` alt='аватар пользователя')
-              .comments__text
-                .comments__head
-                  p #{comment.users.name} #{comment.users.surname} •
-                  time.comments__date(datetime=comment.createdAt) #{moment(article.createdAt).format('DD.MM.YYYY, HH:MM')}
-                p.comments__message #{comment.text}
-          .comments__footer.comments__footer--user
-            form(action=`/articles/${id}/comments` method='POST' enctype="application/x-www-form-urlencoded")
-              input(type="hidden" name="_csrf" value=csrfToken)
-              .comments__avatar.avatar
-                img(src=`/img/${user.avatar}` alt='аватар пользователя')
-              label
-                textarea(rows='1' name='comment' placeholder='Присоединиться к обсуждению')
-                  | #{comment}
-              button.comments__button.button.button--colored(type='submit') Опубликовать
-              +insertErrorMessage(validationMessages)
+
+          if (article.comments.length === 0)
+            h2.comments__title.title.title--middle Комментарии отсутствуют
+
+          else
+            include partials/comment-list.pug
+
+            if (Object.keys(user).length === 0)
+              include partials/comment-register.pug
+
+            else
+              include partials/comment-form.pug
+
+
+
+
