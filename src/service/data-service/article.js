@@ -1,6 +1,7 @@
 'use strict';
 
 const Alias = require(`../models/alias`);
+const {Sequelize} = require(`sequelize`);
 
 class ArticlesService {
   constructor(sequelize) {
@@ -37,6 +38,35 @@ class ArticlesService {
       include,
       order: [[`createdAt`, `DESC`]],
     });
+    return articles.map((article) => article.get());
+  }
+
+  async findMostCommented(limit) {
+    const articles = await this._Article.findAll({
+      attributes: [
+        `id`,
+        `title`,
+        [Sequelize.fn(`COUNT`, Sequelize.col(`comments.id`)), `commentsCount`],
+      ],
+      include: [
+        {
+          model: this._Comment,
+          as: Alias.COMMENTS,
+          attributes: [],
+        },
+      ],
+      group: [Sequelize.col(`Article.id`)],
+      order: [[Sequelize.col(`commentsCount`), `DESC`]],
+      having: Sequelize.where(
+          Sequelize.fn(`COUNT`, Sequelize.col(`comments.id`)),
+          {
+            [Sequelize.Op.gt]: 0,
+          },
+      ),
+      limit,
+      subQuery: false,
+    });
+
     return articles.map((article) => article.get());
   }
 

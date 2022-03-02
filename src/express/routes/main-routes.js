@@ -5,6 +5,8 @@ const {Router} = require(`express`);
 const {getAPI} = require(`../api`);
 const upload = require(`../middlewares/upload`);
 const getUserAuth = require(`../middlewares/get-user-auth`);
+const {MOST_COMMENTED_ARTICLES_COUNT, MAX_MOST_COMMENTED_ARTICLE_TITLE_LENGTH} =
+  process.env;
 
 const OFFERS_PER_PAGE = 8;
 
@@ -22,16 +24,27 @@ mainRouter.get(`/`, getUserAuth, async (req, res) => {
   page = +page;
 
   const limit = OFFERS_PER_PAGE;
+  const maxTitleLength = MAX_MOST_COMMENTED_ARTICLE_TITLE_LENGTH;
 
   const offset = (page - 1) * OFFERS_PER_PAGE;
-  const [{count, articles}, categories] = await Promise.all([
-    api.getArticles({limit, offset}),
-    api.getCategories({count: true}),
-  ]);
+  const [{count, articles}, categories, mostCommentedAtricles] =
+    await Promise.all([
+      api.getArticles({limit, offset}),
+      api.getCategories({count: true}),
+      api.getMostCommentedArticles({limit: MOST_COMMENTED_ARTICLES_COUNT}),
+    ]);
 
   const totalPages = Math.ceil(count / OFFERS_PER_PAGE);
 
-  res.render(`main`, {articles, page, totalPages, categories, user});
+  res.render(`main`, {
+    articles,
+    mostCommentedAtricles,
+    maxTitleLength,
+    page,
+    totalPages,
+    categories,
+    user,
+  });
 });
 
 mainRouter.get(`/register`, getUserAuth, async (req, res) => {

@@ -25,6 +25,8 @@ html(lang='ru')
 
       const getArticleTitle = (articles, id) => articles.filter(article => article.id === id)[0].title;
 
+      const formatArticleTitle = (title, maxTitleLength) => title.length > maxTitleLength ? title.slice(0, maxTitleLength).concat('...') : title;
+
     mixin insertErrorMessage(messages)
       if messages
         .form__validation-error

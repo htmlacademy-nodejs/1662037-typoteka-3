@@ -26,6 +26,10 @@ class API {
     return this._load(`/articles`, {params: {comments, offset, limit}});
   }
 
+  getMostCommentedArticles({limit} = {}) {
+    return this._load(`/articles/most_commented`, {params: {limit}});
+  }
+
   getArticle(id) {
     return this._load(`/articles/${id}`);
   }

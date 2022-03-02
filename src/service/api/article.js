@@ -24,6 +24,17 @@ module.exports = (app, articleService, commentService) => {
     return res.status(HttpCode.OK).json(result);
   });
 
+  router.get(`/most_commented`, async (req, res) => {
+    const {limit} = req.query;
+    const articles = await articleService.findMostCommented(limit);
+
+    if (!articles) {
+      return res.send([]);
+    }
+
+    return res.status(HttpCode.OK).json(articles);
+  });
+
   router.get(
       `/:articleId`,
       [
@@ -116,14 +127,10 @@ module.exports = (app, articleService, commentService) => {
         const isDeleted = await commentService.drop(commentId);
 
         if (!isDeleted) {
-          return res
-          .status(HttpCode.NOT_FOUND)
-          .send(`Comment with id ${commentId} not found`);
+          return res.status(HttpCode.NOT_FOUND);
         }
 
-        return res
-        .status(HttpCode.OK)
-        .json(`Comment with id ${commentId} has been deleted`);
+        return res.status(HttpCode.OK);
       },
   );
 
