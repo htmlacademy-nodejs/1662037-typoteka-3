@@ -35,6 +35,17 @@ module.exports = (app, articleService, commentService) => {
     return res.status(HttpCode.OK).json(articles);
   });
 
+  router.get(`/latest_comments`, async (req, res) => {
+    const {limit} = req.query;
+    const comments = await commentService.findLatest(limit);
+
+    if (!comments) {
+      return res.send([]);
+    }
+
+    return res.status(HttpCode.OK).json(comments);
+  });
+
   router.get(
       `/:articleId`,
       [

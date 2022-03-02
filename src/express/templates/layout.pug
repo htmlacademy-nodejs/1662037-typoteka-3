@@ -25,7 +25,7 @@ html(lang='ru')
 
       const getArticleTitle = (articles, id) => articles.filter(article => article.id === id)[0].title;
 
-      const formatArticleAnnounce = (announce, maxAnnounceLength) => announce.length > maxAnnounceLength ? announce.slice(0, maxAnnounceLength).concat('...') : announce;
+      const truncateText = (text, maxLength) => text.length > maxLength ? text.slice(0, maxLength).concat('...') : text;
 
     mixin insertErrorMessage(messages)
       if messages

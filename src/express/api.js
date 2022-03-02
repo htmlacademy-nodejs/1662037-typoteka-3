@@ -30,6 +30,10 @@ class API {
     return this._load(`/articles/most_commented`, {params: {limit}});
   }
 
+  getLatestComments({limit} = {}) {
+    return this._load(`/articles/latest_comments`, {params: {limit}});
+  }
+
   getArticle(id) {
     return this._load(`/articles/${id}`);
   }

@@ -2,6 +2,7 @@
 
 const Alias = require(`../models/alias`);
 
+
 class CommentService {
   constructor(sequelize) {
     this._Comment = sequelize.models.Comment;
@@ -21,6 +22,24 @@ class CommentService {
         },
       ],
     });
+  }
+
+  async findLatest(limit) {
+    const comments = await this._Comment.findAll({
+      attributes: [`articleId`, `text`, `createdAt`],
+      include: [
+        {
+          model: this._User,
+          as: Alias.USERS,
+          attributes: [`avatar`, `name`, `surname`],
+        },
+      ],
+      order: [[`createdAt`, `DESC`]],
+      limit,
+      subQuery: false,
+    });
+
+    return comments.map((article) => article.get());
   }
 
   async create(articleId, commentData) {
