@@ -45,7 +45,7 @@ class ArticlesService {
     const articles = await this._Article.findAll({
       attributes: [
         `id`,
-        `title`,
+        `announce`,
         [Sequelize.fn(`COUNT`, Sequelize.col(`comments.id`)), `commentsCount`],
       ],
       include: [

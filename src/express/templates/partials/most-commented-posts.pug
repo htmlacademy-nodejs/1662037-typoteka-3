@@ -5,5 +5,5 @@ section.main-page__hot.hot
   ul.hot__list
     each article in mostCommentedAtricles
       li.hot__list-item
-          a.hot__list-link(href=`/articles/${article.id}`) #{formatArticleTitle(article.title, maxTitleLength)}
+          a.hot__list-link(href=`/articles/${article.id}`) #{formatArticleAnnounce(article.announce, maxAnnounceLength)}
             sup.hot__link-sup #{article.commentsCount}
