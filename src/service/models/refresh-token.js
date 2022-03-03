@@ -8,7 +8,8 @@ const define = (sequelize) =>
   RefreshToken.init(
       {
         token: {
-          type: DataTypes.STRING,
+          //  eslint-disable-next-line new-cap
+          type: DataTypes.STRING(1000),
           allowNull: false,
         },
       },

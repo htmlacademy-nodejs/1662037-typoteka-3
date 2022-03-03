@@ -41,8 +41,6 @@ mainRouter.get(`/`, getUserAuth, async (req, res) => {
       api.getLatestComments({limit: LATEST_COMMENTS_COUNT}),
     ]);
 
-    console.log(Object.keys(user).length === 0);
-
   const totalPages = Math.ceil(count / OFFERS_PER_PAGE);
   const withPagination = totalPages > 1;
 

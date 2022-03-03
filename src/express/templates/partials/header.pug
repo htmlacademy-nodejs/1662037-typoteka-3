@@ -2,6 +2,15 @@ header.header
   a.header__logo.logo(href='/')
     img.logo__image(src='/img/icons/logo-image-only.svg' alt='логотип Тайпотеки')
     span.logo__name Типотека
+  if user && user.role === `ADMIN`
+    a.button.button--colored.header__button-new(href='/articles/add') Новая запись
+    div.header__dropdown
+      a.button.button--burger.header__burger Открыть меню
+      u.navigation.header__navigation
+        li.navigation__item
+          a(href=`/my`) Мои публикации
+          a(href=`/my/comments`) Комментарии
+          a(href=`/categories`) Категории
   nav.header__nav
   if (user && Object.keys(user).length !== 0)
     ul.header__nav-list
