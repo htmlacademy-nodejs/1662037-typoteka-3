@@ -15,7 +15,7 @@
     "start-servers::debug": "concurrently --names \"BACK,FRONT\" --prefix-colors \"green,blue\" \"npm run start-back-server::debug\" \"npm run start-front-server::debug\"",
     "start": "npm run start-servers",
     "start::debug": "npm run start-servers::debug",
-    "filldb": "cross-env LOG_LEVEL=info NODE_ENV=development node -r dotenv/config ./src/service/service.js --filldb 5"
+    "filldb": "cross-env LOG_LEVEL=info NODE_ENV=development node -r dotenv/config ./src/service/service.js --filldb 50"
   },
   "repository": {
     "type": "git",

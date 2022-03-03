@@ -25,7 +25,7 @@ app.use(
       contentSecurityPolicy: {
         directives: {
           // eslint-disable-next-line quotes
-          scriptSrc: ["'self'"],
+          scriptSrc: ["'self'", "'unsafe-eval'"],
         },
       },
       xssFilter: true,
