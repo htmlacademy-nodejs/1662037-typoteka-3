@@ -3,9 +3,19 @@ header.header
     img.logo__image(src='/img/icons/logo-image-only.svg' alt='логотип Тайпотеки')
     span.logo__name Типотека
   nav.header__nav
+  if (user && Object.keys(user).length !== 0)
+    ul.header__nav-list
+      li.header__list-item
+        p #{user.name} #{user.surname}
+      li.header__list-item
+        a.header__exit(href='/logout') Выйти
+    a.header__avatar.avatar
+        img(src=`/img/${user.avatar}` alt='аватар пользователя')
+    a.header__search.button.button--search(href='/search' aria-label='поиск по сайту')
+  else
     ul.header__nav-list
       li.header__list-item
         a.header__registration(href='/register') Регистрация
       li.header__list-item
         a.header__enter(href='/login') Вход с паролем
-  a.header__search.button.button--search(href='/search' aria-label='поиск по сайту')
+    a.header__search.button.button--search(href='/search' aria-label='поиск по сайту')
