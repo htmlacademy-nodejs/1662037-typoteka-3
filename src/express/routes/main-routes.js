@@ -10,17 +10,17 @@ const {
   MOST_COMMENTED_ARTICLES_COUNT,
   MAX_ANNOUNCE_LENGTH,
   LATEST_COMMENTS_COUNT,
-  MAX_COMMENT_LENGTH
+  MAX_COMMENT_LENGTH,
+  OFFERS_PER_PAGE,
+  JWT_COOKIE_MAXAGE,
 } = process.env;
-
-const OFFERS_PER_PAGE = 8;
 
 const mainRouter = new Router();
 const api = getAPI();
 const cookieOptions = {
   httpOnly: true,
   sameSite: true,
-  maxAge: 1000 * 60 * 60 * 24,
+  maxAge: JWT_COOKIE_MAXAGE,
 };
 
 mainRouter.get(`/`, getUserAuth, async (req, res) => {
@@ -42,6 +42,7 @@ mainRouter.get(`/`, getUserAuth, async (req, res) => {
     ]);
 
   const totalPages = Math.ceil(count / OFFERS_PER_PAGE);
+  const withPagination = totalPages > 1;
 
   res.render(`main`, {
     articles,
@@ -51,6 +52,7 @@ mainRouter.get(`/`, getUserAuth, async (req, res) => {
     maxCommentLength,
     page,
     totalPages,
+    withPagination,
     categories,
     user,
   });

@@ -3,6 +3,9 @@ section.main-page__theme-list
   ul.themes
     each category of categories
       li.themes__item
-        a.themes__item-link(href='#')
+        a(
+          class=`themes__item-link ${currentCategory && currentCategory.id === category.id ? `themes__item-link--active` : ``}`
+          href=`${currentCategory && currentCategory.id === category.id ? `#` : `/articles/category/${category.id}`}`
+          )
           | #{category.name}
           sup #{category.count}

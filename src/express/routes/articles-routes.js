@@ -10,6 +10,8 @@ const checkAdmin = require(`../middlewares/check-admin`);
 const {getAPI} = require(`../api`);
 const {HttpCode} = require(`../../const`);
 
+const {OFFERS_PER_PAGE} = process.env;
+
 const articlesRouter = new Router();
 const api = getAPI();
 const csrfProtection = csrf({cookie: {httpOnly: true, sameSite: true}});
@@ -122,13 +124,37 @@ articlesRouter.post(
     },
 );
 
-articlesRouter.get(`/category/:id`, (req, res) => {
-  res.send(`/articles/category/:id`);
-});
-
-articlesRouter.get(`/articles-by-category`, getUserAuth, (req, res) => {
+articlesRouter.get(`/category/:id`, getUserAuth, async (req, res) => {
   const user = res.locals.user || {};
-  res.render(`articles-by-category`, {user});
+  const {id} = req.params;
+  let {page = 1} = req.query;
+  page = +page;
+
+  const limit = OFFERS_PER_PAGE;
+
+  const offset = (page - 1) * OFFERS_PER_PAGE;
+  const [{count, articles}, categories, currentCategory] = await Promise.all([
+    api.getArticles({limit, offset, categoryId: id}),
+    api.getCategories({count: true}),
+    api.getCategory({id}),
+  ]);
+
+  if (!currentCategory) {
+    res.redirect(`/`);
+  }
+
+  const totalPages = Math.ceil(count / OFFERS_PER_PAGE);
+  const withPagination = totalPages > 1;
+
+  res.render(`articles-by-category`, {
+    articles,
+    page,
+    totalPages,
+    withPagination,
+    categories,
+    currentCategory,
+    user,
+  });
 });
 
 articlesRouter.get(`/:id`, getUserAuth, csrfProtection, async (req, res) => {

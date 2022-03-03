@@ -22,8 +22,10 @@ class API {
     return response.data;
   }
 
-  getArticles({comments, offset, limit} = {}) {
-    return this._load(`/articles`, {params: {comments, offset, limit}});
+  getArticles({comments, offset, limit, categoryId} = {}) {
+    return this._load(`/articles`, {
+      params: {comments, offset, limit, categoryId},
+    });
   }
 
   getMostCommentedArticles({limit} = {}) {
@@ -43,7 +45,11 @@ class API {
   }
 
   async getCategories({count} = {}) {
-    return this._load(`/category`, {params: {count}});
+    return this._load(`/categories`, {params: {count}});
+  }
+
+  async getCategory({id}) {
+    return this._load(`/categories/${id}`);
   }
 
   async createArticle(data) {

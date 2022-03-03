@@ -35,6 +35,10 @@ const define = (sequelize) => {
     as: Alias.ARTICLE_CATEGORIES,
     foreignKey: `categoryId`
   });
+  Article.hasMany(ArticleCategory, {
+    as: Alias.ARTICLE_CATEGORIES,
+    foreignKey: `articleId`,
+  });
 
   User.hasMany(Article, {as: Alias.ARTICLES, foreignKey: `userId`});
   Article.belongsTo(User, {as: Alias.USERS, foreignKey: `userId`});
