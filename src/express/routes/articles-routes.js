@@ -215,4 +215,21 @@ articlesRouter.post(
     },
 );
 
+articlesRouter.post(
+    `/delete/:id`,
+    getUserAuth,
+    checkAuth,
+    checkAdmin,
+    async (req, res) => {
+      const {id} = req.params;
+
+      try {
+        await api.deleteArticle(id);
+        res.redirect(`/my`);
+      } catch (errors) {
+        res.redirect(`/my`);
+      }
+    },
+);
+
 module.exports = articlesRouter;

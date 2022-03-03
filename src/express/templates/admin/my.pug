@@ -10,5 +10,6 @@ block content
           li.notes__list-item
             time.notes__item-time(datetime=article.createdAt) #{moment(article.createdAt).format('DD.MM.YYYY, HH:MM')}
             a.notes__item-text(href=`/articles/${article.id}`) #{article.title}
-            button.notes__button.button.button--close-item(type='button')
-              span.visually-hidden Закрыть строку списка
+            form(method='POST' action=`/articles/delete/${article.id}`)
+              button.notes__button.button.button--close-item(type='sybmit')
+                span.visually-hidden Закрыть строку списка

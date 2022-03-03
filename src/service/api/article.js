@@ -101,13 +101,11 @@ module.exports = (app, articleService, commentService) => {
 
         if (!isDeleted) {
           return res
-          .status(HttpCode.BAD_REQUEST)
-          .send(`Article hasn't been deleted`);
+          .status(HttpCode.BAD_REQUEST);
         }
 
         return res
-        .status(HttpCode.OK)
-        .json(`Article with id ${articleId} has been deleted`);
+        .status(HttpCode.OK);
       },
   );
 
