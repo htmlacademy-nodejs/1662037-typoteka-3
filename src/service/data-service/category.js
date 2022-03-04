@@ -52,6 +52,10 @@ class CategoryService {
       raw: true,
     });
   }
+
+  async create(name) {
+    return await this._Category.create({name});
+  }
 }
 
 module.exports = CategoryService;

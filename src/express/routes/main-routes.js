@@ -147,7 +147,6 @@ mainRouter.get(`/search`, getUserAuth, async (req, res) => {
     });
   }
 });
-mainRouter.get(`/categories`, getUserAuth, (req, res) => res.render(`all-categories`));
 mainRouter.get(`/post-detail`, getUserAuth, (req, res) => res.render(`post-detail`));
 
 module.exports = mainRouter;

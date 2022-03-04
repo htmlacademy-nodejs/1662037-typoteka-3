@@ -119,6 +119,13 @@ class API {
       data: {email},
     });
   }
+
+  async createCategory(name) {
+    return this._load(`/categories/add`, {
+      method: HttpMethod.POST,
+      data: {name},
+    });
+  }
 }
 
 const defaultAPI = new API(defaultUrl, TIMEOUT);
