@@ -11,5 +11,4 @@ module.exports = (service) => async (req, res, next) => {
   }
 
   return next();
-
 };

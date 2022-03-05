@@ -2,8 +2,9 @@
 
 const {Router} = require(`express`);
 const {HttpCode} = require(`../../const`);
-const validateCategory = require(`../middlewares/validate-category`);
+const validateCategoryName = require(`../middlewares/validate-category-name`);
 const checkCategoryIsEmpty = require(`../middlewares/check-category-is-empty`);
+const checkCategoryExistance = require(`../middlewares/check-category-existance`);
 
 
 module.exports = (app, service) => {
@@ -24,22 +25,49 @@ module.exports = (app, service) => {
     res.status(HttpCode.OK).json(category);
   });
 
-  router.post(`/add`, validateCategory, async (req, res) => {
+  router.post(`/add`, validateCategoryName, async (req, res) => {
     const {name} = req.body;
 
     const category = await service.create(name);
     res.status(HttpCode.OK).json(category);
   });
 
-  router.delete(`/:id`, checkCategoryIsEmpty(service), async (req, res) => {
-    const {id} = req.params;
+  router.delete(
+      `/:id`,
+      checkCategoryExistance(service),
+      checkCategoryIsEmpty(service),
+      async (req, res) => {
+        const {id} = req.params;
 
-    const isDeleted = await service.drop(id);
+        const isDeleted = await service.drop(id);
 
-    if (!isDeleted) {
-      return res.sendStatus(HttpCode.NOT_FOUND);
-    }
+        if (!isDeleted) {
+          return res.sendStatus(HttpCode.NOT_FOUND);
+        }
 
-    return res.sendStatus(HttpCode.OK);
-  });
+        return res.sendStatus(HttpCode.OK);
+      },
+  );
+
+  router.put(
+      `/:id`,
+      checkCategoryExistance(service),
+      validateCategoryName,
+      async (req, res) => {
+        const {id} = req.params;
+        const {name} = req.body;
+
+        const isUpdated = await service.update(id, name);
+
+        if (!isUpdated) {
+          return res
+            .sendStatus(HttpCode.BAD_REQUEST)
+            .send(`Category hasn't been updated`);
+        }
+
+        return res
+          .status(HttpCode.OK)
+          .send(`Category with id ${id} has been updated`);
+      },
+  );
 };

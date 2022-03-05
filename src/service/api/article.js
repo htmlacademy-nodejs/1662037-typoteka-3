@@ -85,7 +85,7 @@ module.exports = (app, articleService, commentService) => {
 
         return res
         .status(HttpCode.OK)
-        .json(`Article with id ${articleId} has been updated`);
+        .send(`Article with id ${articleId} has been updated`);
       },
   );
 

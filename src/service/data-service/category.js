@@ -37,12 +37,16 @@ class CategoryService {
             },
         ),
         group: [Sequelize.col(`Category.id`)],
+        order: [[`name`, `ASC`]],
       });
 
       return result.map((item) => item.get());
     }
 
-    return await this._Category.findAll({raw: true});
+    return await this._Category.findAll({
+      raw: true,
+      order: [[`name`, `ASC`]],
+    });
   }
 
   async findOne(id) {
@@ -55,6 +59,14 @@ class CategoryService {
 
   async create(name) {
     return await this._Category.create({name});
+  }
+
+  async update(id, name) {
+    const updatedRows = await this._Category.update(
+        {name},
+        {where: {id}},
+    );
+    return !!updatedRows;
   }
 
   async drop(id) {

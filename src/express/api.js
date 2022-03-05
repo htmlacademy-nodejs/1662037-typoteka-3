@@ -127,6 +127,13 @@ class API {
     });
   }
 
+  async updateCategory(id, name) {
+    return this._load(`/categories/${id}`, {
+      method: HttpMethod.PUT,
+      data: {name},
+    });
+  }
+
   async deleteCategory(id) {
     return this._load(`/categories/${id}`, {
       method: HttpMethod.DELETE,

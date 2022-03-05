@@ -16,8 +16,8 @@ block content
       ul.category__list
         each category of categories
           li.category__list-item
-            form(action='#' method='POST')
-              input#modify-form-category-1(type='text' name=`category-${category.id}` value=`${category.name}`)
+            form(action=`/my/categories/update/${category.id}` method='POST')
+              input(id=`modify-form-category-${category.id}` type='text' name=`name` value=`${category.name}`)
               label(for=`modify-form-category-${category.id}`)
                 span.visually-hidden Редактировать категорию
               button.category__button.button.button--category(type='submit') Сохранить
