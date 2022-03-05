@@ -9,7 +9,7 @@ section.main-page__last.last
     ul.last__list
       each comment in latestComments
         li.last__list-item
-          img.last__list-image(src=`img/${comment.users.avatar}` width='20' height='20' alt='Аватар пользователя')
+          img.last__list-image(src=`/img/${comment.users.avatar ? comment.users.avatar : `/icons/smile.svg`}` width='20' height='20' alt='Аватар пользователя')
           b.last__list-name #{comment.users.name} #{comment.users.surname}
           a.last__list-link(href=`/articles/${comment.articleId}`) #{truncateText(comment.text, maxCommentLength)}
 

@@ -19,7 +19,7 @@ header.header
       li.header__list-item
         a.header__exit(href='/logout') Выйти
     a.header__avatar.avatar
-        img(src=`/img/${user.avatar}` alt='аватар пользователя')
+        img(src=`/img/${user.avatar ? user.avatar : `/icons/smile.svg`}` alt='аватар пользователя')
     a.header__search.button.button--search(href='/search' aria-label='поиск по сайту')
   else
     ul.header__nav-list

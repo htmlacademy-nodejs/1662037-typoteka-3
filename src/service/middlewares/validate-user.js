@@ -39,9 +39,7 @@ const schema = Joi.object({
     .messages({
       'any.only': ErrorRegisterMessage.PASSWORD_REPEATED,
     }),
-  avatar: Joi.string().required().messages({
-    'string.empty': ErrorRegisterMessage.AVATAR,
-  }),
+  avatar: Joi.string().optional().allow(``),
 });
 
 module.exports = (service) => async (req, res, next) => {

@@ -3,7 +3,7 @@ ul.comments__list
   each comment in article.comments
     li.comments__comment
     .comments__avatar.avatar
-      img(src=`/img/${comment.users.avatar}` alt='аватар пользователя')
+      img(src=`/img/${comment.users.avatar ? comment.users.avatar : `/icons/smile.svg`}` alt='аватар пользователя')
     .comments__text
       .comments__head
         p #{comment.users.name} #{comment.users.surname} •

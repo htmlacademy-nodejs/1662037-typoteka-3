@@ -31,11 +31,11 @@ block content
           else
             include partials/comment-list.pug
 
-            if (Object.keys(user).length === 0)
-              include partials/comment-register.pug
+          if (Object.keys(user).length === 0)
+            include partials/comment-register.pug
 
-            else
-              include partials/comment-form.pug
+          else
+            include partials/comment-form.pug
 
 
 
