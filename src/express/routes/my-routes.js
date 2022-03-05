@@ -36,14 +36,29 @@ myRouter.get(`/categories`, getUserAuth, checkAuth, checkAdmin, async (req, res)
 
 myRouter.post(`/categories/add`, getUserAuth, checkAuth, checkAdmin, async (req, res) => {
   const {name} = req.body;
-  const categories = await api.getCategories();
+  let categories;
 
   try {
     await api.createCategory(name);
+    categories = await api.getCategories();
     res.render(`admin/all-categories`, {categories});
   } catch (errors) {
     const validationMessages = errors.response.data;
+    categories = await api.getCategories();
     res.render(`admin/all-categories`, {categories, validationMessages});
+  }
+});
+
+myRouter.post(`/categories/delete/:id`, getUserAuth, checkAuth, checkAdmin, async (req, res) => {
+  const {id} = req.params;
+  let categories = await api.getCategories();
+
+  try {
+    await api.deleteCategory(id);
+    categories = await api.getCategories();
+    res.render(`admin/all-categories`, {categories});
+  } catch (errors) {
+    res.render(`admin/all-categories`, {categories});
   }
 });
 

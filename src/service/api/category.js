@@ -3,6 +3,7 @@
 const {Router} = require(`express`);
 const {HttpCode} = require(`../../const`);
 const validateCategory = require(`../middlewares/validate-category`);
+const checkCategoryIsEmpty = require(`../middlewares/check-category-is-empty`);
 
 
 module.exports = (app, service) => {
@@ -28,5 +29,17 @@ module.exports = (app, service) => {
 
     const category = await service.create(name);
     res.status(HttpCode.OK).json(category);
+  });
+
+  router.delete(`/:id`, checkCategoryIsEmpty(service), async (req, res) => {
+    const {id} = req.params;
+
+    const isDeleted = await service.drop(id);
+
+    if (!isDeleted) {
+      return res.sendStatus(HttpCode.NOT_FOUND);
+    }
+
+    return res.sendStatus(HttpCode.OK);
   });
 };

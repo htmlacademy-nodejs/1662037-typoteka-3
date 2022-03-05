@@ -136,10 +136,10 @@ module.exports = (app, articleService, commentService) => {
         const isDeleted = await commentService.drop(commentId);
 
         if (!isDeleted) {
-          return res.status(HttpCode.NOT_FOUND);
+          return res.sendStatus(HttpCode.NOT_FOUND);
         }
 
-        return res.status(HttpCode.OK);
+        return res.sendStatus(HttpCode.OK);
       },
   );
 

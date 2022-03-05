@@ -5,13 +5,14 @@ block content
   main.main-page.main-page--padding
     section.main-page__category.category
       h1.category__title Категории
-      +insertErrorMessage(validationMessages)
       .category__add-form
         form(action='/my/categories/add' method='POST')
           input#add-form-add-category(type='text' name='name' placeholder='Новая категория')
           label(for='add-form-add-category')
             span.visually-hidden Добавить категорию
           button.category__button.button.button--category(type='submit') Добавить
+      +insertErrorMessage(validationMessages)
+      p
       ul.category__list
         each category of categories
           li.category__list-item
@@ -20,5 +21,6 @@ block content
               label(for=`modify-form-category-${category.id}`)
                 span.visually-hidden Редактировать категорию
               button.category__button.button.button--category(type='submit') Сохранить
-              button.category__button.button.button--category(type='button') Удалить
+            form(method='POST' action=`/my/categories/delete/${category.id}`)
+              button.category__button.button.button--category(type='submit') Удалить
 

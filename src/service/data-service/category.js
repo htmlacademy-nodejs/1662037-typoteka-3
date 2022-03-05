@@ -56,6 +56,18 @@ class CategoryService {
   async create(name) {
     return await this._Category.create({name});
   }
+
+  async drop(id) {
+    const deletedRows = await this._Category.destroy({where: {id}});
+    return !!deletedRows;
+  }
+
+  async getArticlesByCategory(categoryId) {
+    return await this._ArticleCategory.findAll({
+      raw: true,
+      where: {categoryId},
+    });
+  }
 }
 
 module.exports = CategoryService;
