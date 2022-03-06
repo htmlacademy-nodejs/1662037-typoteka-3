@@ -16,7 +16,6 @@ const ErrorArticleMessage = {
   ANNOUNCE_MAX: `Announce is longer than ${MAX_SYMBOLS} symbols`,
   ANNOUNCE_EMPTY: `Announce is not allowed to be empty`,
   FULL_TEXT_MAX: `Full text is longer that ${MAX_FULL_DESCRIPTION} symbols`,
-  FULL_TEXT_EMPTY: `Full text is not allowed to be empty`,
   USER_ID: `User ID is invalid`,
 };
 
@@ -31,9 +30,8 @@ const schema = Joi.object({
     'string.max': ErrorArticleMessage.ANNOUNCE_MAX,
     'string.empty': ErrorArticleMessage.ANNOUNCE_EMPTY,
   }),
-  fullText: Joi.string().max(MAX_FULL_DESCRIPTION).required().messages({
+  fullText: Joi.string().max(MAX_FULL_DESCRIPTION).optional().allow(``).messages({
     'string.max': ErrorArticleMessage.FULL_TEXT_MAX,
-    'string.empty': ErrorArticleMessage.FULL_TEXT_EMPTY,
   }),
   categories: Joi.array()
     .items(

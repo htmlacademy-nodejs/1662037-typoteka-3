@@ -26,8 +26,8 @@ const assembleCategories = (formData) => {
 articlesRouter.get(`/add`, getUserAuth, checkAuth, csrfProtection, async (req, res) => {
   const {user} = res.locals;
   const categories = await api.getCategories();
-  res.render(`new-post`, {
-    article: {},
+
+  res.render(`post-add-edit`, {
     categories,
     user,
     csrfToken: req.csrfToken(),
@@ -48,7 +48,7 @@ articlesRouter.post(
         picture: file ? file.filename : ``,
         title: body.title,
         fullText: body[`full-text`],
-        announce: body.announcement,
+        announce: body.announce,
         categories: assembleCategories(body),
         userId: user.id,
       };
@@ -59,7 +59,8 @@ articlesRouter.post(
       } catch (errors) {
         const categories = await api.getCategories();
         const validationMessages = errors.response.data;
-        res.render(`new-post`, {
+
+        res.render(`post-add-edit`, {
           article: articleData,
           categories,
           validationMessages,
@@ -76,7 +77,8 @@ articlesRouter.get(`/edit/:id`, getUserAuth, checkAuth, csrfProtection, async (r
       api.getArticle(id),
       api.getCategories(),
     ]);
-    return res.render(`post-edit`, {
+
+    return res.render(`post-add-edit`, {
       id,
       article,
       categories,
@@ -103,7 +105,7 @@ articlesRouter.post(
         picture: file ? file.filename : body.photo,
         title: body.title,
         fullText: body[`full-text`],
-        announce: body.announcement,
+        announce: body.announce,
         categories: assembleCategories(body),
         userId: user.id,
       };
@@ -114,11 +116,12 @@ articlesRouter.post(
       } catch (errors) {
         const categories = await api.getCategories();
         const validationMessages = errors.response.data;
-        res.render(`post-edit`, {
+
+        res.render(`post-add-edit`, {
           article: articleData,
           categories,
           validationMessages,
-          user
+          user,
         });
       }
     },

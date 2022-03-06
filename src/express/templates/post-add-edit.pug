@@ -1,0 +1,52 @@
+extends layout.pug
+
+
+block content
+
+  main
+    section
+      .popup.popup--new-publication.popup--anti
+        .new-publication
+          form(action=`${article && article.id ? `/articles/edit/${article.id}` : `/articles/add`}` method='post' enctype="multipart/form-data")
+            .new-publication__header
+              h1 #{article && article.id  ? `Редактирование публикации` : `Новая публикация`}
+              .new-publication__date-form
+                if article && article.createdAt
+                  h3 Дата публикации
+                  .new-publication__date-form-division
+                    .new-publication__date-block
+                      label(for='new-publication-date' aria-label='Календарь')
+                      input#new-publication-date(type='text' name='date' placeholder='...' value=`${article.createdAt}` )
+              button.new-publication__button.button.button--colored(type='submit') Опубликовать
+            a.popup__button.button.button--popup-close(href=`/` aria-label='Закрыть окно')
+              | Закрыть
+              | окно
+            +insertErrorMessage(validationMessages)
+            .new-publication__form.form
+              .form__wrapper.form__wrapper--intro
+                .form__field
+                  input(type="hidden" name="_csrf" value=csrfToken)
+                  label
+                    input(type='text' name='title' placeholder='Заголовок' value=`${article ? article.title : ''}` required='')
+                .form__field.form__field--post-image
+                  label
+                    input#image-name-field(type='text' name='photo' placeholder='Фотография' readonly='' value=`${article && article.picture ? article.picture : ``}`)
+                  .form__image-loader.form__image-loader--publication
+                    label
+                      input.visually-hidden(type='file' name='upload')
+                      | Обзор
+
+                .new-publication__category-wrapper
+                  each category in categories
+                    .new-publication__checkbox(href='#')
+                      input(class=`checkbox-${category.id}` type='checkbox' name=`category-${category.id}` checked=article ? isChecked(article, category) : false id = category.id)
+                      label(for=category.id) #{category.name}
+              .form__wrapper.form__wrapper--text
+                .form__field.form__field--publication-text
+                  label
+                    textarea(rows='5' name='announce' placeholder='Анонс публикации' ) #{article ? article.announce : ''}
+                .form__field.form__field--publication-text
+                  label
+                    textarea(rows='10' name='full-text' placeholder='Полный текст публикации' value=`${article ? article.fullText : ''}`)
+                      | #{article ? article.fullText : ''}
+
