@@ -161,6 +161,10 @@ articlesRouter.get(`/:id`, getUserAuth, csrfProtection, async (req, res) => {
   const user = res.locals.user || {};
   const {id} = req.params;
 
+  const referer = req.get(`Referrer`);
+
+  const back = referer || `/`;
+
   try {
     const article = await api.getArticle(id);
     return res.render(`post-detail`, {
@@ -168,6 +172,7 @@ articlesRouter.get(`/:id`, getUserAuth, csrfProtection, async (req, res) => {
       article,
       user,
       csrfToken: req.csrfToken(),
+      back
     });
   } catch (error) {
     return res.status(HttpCode.NOT_FOUND).render(`errors/404`);

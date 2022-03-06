@@ -28,6 +28,7 @@ app.use(
           scriptSrc: ["'self'", "'unsafe-eval'"],
         },
       },
+      referrerPolicy: {policy: `same-origin`},
       xssFilter: true,
     }),
 );
