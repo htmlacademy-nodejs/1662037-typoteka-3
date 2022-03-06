@@ -84,7 +84,7 @@ mainRouter.post(`/register`, upload.single(`upload`), async (req, res) => {
     res.redirect(`/login`);
   } catch (errors) {
     const validationMessages = errors.response.data;
-    res.render(`sign-up`, {validationMessages});
+    res.render(`sign-up`, {validationMessages, userData});
   }
 });
 
