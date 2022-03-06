@@ -53,15 +53,13 @@ myRouter.post(
     checkAdmin,
     async (req, res) => {
       const {name} = req.body;
-      let categories;
 
       try {
         await api.createCategory(name);
-        categories = await api.getCategories();
-        res.render(`admin/all-categories`, {categories});
+        res.redirect(`/my/categories`);
       } catch (errors) {
         const validationMessages = errors.response.data;
-        categories = await api.getCategories();
+        const categories = await api.getCategories();
         res.render(`admin/all-categories`, {categories, validationMessages});
       }
     },
@@ -74,12 +72,11 @@ myRouter.post(
     checkAdmin,
     async (req, res) => {
       const {id} = req.params;
-      let categories = await api.getCategories();
+      const categories = await api.getCategories();
 
       try {
         await api.deleteCategory(id);
-        categories = await api.getCategories();
-        res.render(`admin/all-categories`, {categories});
+        res.redirect(`/my/categories`);
       } catch (errors) {
         const validationMessages = [errors.response.data];
         res.render(`admin/all-categories`, {categories, validationMessages});
@@ -95,12 +92,11 @@ myRouter.post(
     async (req, res) => {
       const {id} = req.params;
       const {name} = req.body;
-      let categories = await api.getCategories();
+      const categories = await api.getCategories();
 
       try {
         await api.updateCategory(id, name);
-        categories = await api.getCategories();
-        res.render(`admin/all-categories`, {categories});
+        res.redirect(`/my/categories`);
       } catch (errors) {
         const validationMessages = errors.response.data;
         res.render(`admin/all-categories`, {categories, validationMessages});

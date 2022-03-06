@@ -148,6 +148,7 @@ mainRouter.get(`/search`, getUserAuth, async (req, res) => {
     });
   }
 });
+
 mainRouter.get(`/post-detail`, getUserAuth, (req, res) => res.render(`post-detail`));
 
 module.exports = mainRouter;
