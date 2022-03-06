@@ -90,10 +90,11 @@ mainRouter.post(`/register`, upload.single(`upload`), async (req, res) => {
 
 mainRouter.get(`/login`, (req, res) => res.render(`login`));
 mainRouter.post(`/login`, async (req, res) => {
+  const {email, password} = req.body;
   try {
     const {accessToken, refreshToken} = await api.auth(
-        req.body.email,
-        req.body.password,
+        email,
+        password,
     );
     res.cookie(`accessToken`, accessToken, cookieOptions);
     res.cookie(`refreshToken`, refreshToken, cookieOptions);
@@ -102,7 +103,7 @@ mainRouter.post(`/login`, async (req, res) => {
   } catch (errors) {
     const validationMessages = [errors.response.data];
 
-    res.render(`login`, {validationMessages});
+    res.render(`login`, {validationMessages, email});
   }
 });
 
