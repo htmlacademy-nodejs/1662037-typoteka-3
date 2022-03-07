@@ -22,8 +22,18 @@ class API {
     return response.data;
   }
 
-  getArticles({comments, offset, limit} = {}) {
-    return this._load(`/articles`, {params: {comments, offset, limit}});
+  getArticles({comments, offset, limit, categoryId} = {}) {
+    return this._load(`/articles`, {
+      params: {comments, offset, limit, categoryId},
+    });
+  }
+
+  getMostCommentedArticles({limit} = {}) {
+    return this._load(`/articles/most_commented`, {params: {limit}});
+  }
+
+  getLatestComments({limit} = {}) {
+    return this._load(`/articles/latest_comments`, {params: {limit}});
   }
 
   getArticle(id) {
@@ -35,7 +45,11 @@ class API {
   }
 
   async getCategories({count} = {}) {
-    return this._load(`/category`, {params: {count}});
+    return this._load(`/categories`, {params: {count}});
+  }
+
+  async getCategory({id}) {
+    return this._load(`/categories/${id}`);
   }
 
   async createArticle(data) {
@@ -52,10 +66,22 @@ class API {
     });
   }
 
+  async deleteArticle(id) {
+    return this._load(`/articles/${id}`, {
+      method: HttpMethod.DELETE,
+    });
+  }
+
   async createComment(id, data) {
     return this._load(`/articles/${id}/comments`, {
       method: HttpMethod.POST,
       data,
+    });
+  }
+
+  async deleteComment({articleId, commentId}) {
+    return this._load(`/articles/${articleId}/comments/${commentId}`, {
+      method: HttpMethod.DELETE,
     });
   }
 
@@ -91,6 +117,26 @@ class API {
     return this._load(`/user/admin`, {
       method: HttpMethod.POST,
       data: {email},
+    });
+  }
+
+  async createCategory(name) {
+    return this._load(`/categories/add`, {
+      method: HttpMethod.POST,
+      data: {name},
+    });
+  }
+
+  async updateCategory(id, name) {
+    return this._load(`/categories/${id}`, {
+      method: HttpMethod.PUT,
+      data: {name},
+    });
+  }
+
+  async deleteCategory(id) {
+    return this._load(`/categories/${id}`, {
+      method: HttpMethod.DELETE,
     });
   }
 }

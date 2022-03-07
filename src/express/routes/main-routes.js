@@ -6,14 +6,21 @@ const {getAPI} = require(`../api`);
 const upload = require(`../middlewares/upload`);
 const getUserAuth = require(`../middlewares/get-user-auth`);
 
-const OFFERS_PER_PAGE = 8;
+const {
+  MOST_COMMENTED_ARTICLES_COUNT,
+  MAX_ANNOUNCE_LENGTH,
+  LATEST_COMMENTS_COUNT,
+  MAX_COMMENT_LENGTH,
+  OFFERS_PER_PAGE,
+  JWT_COOKIE_MAXAGE,
+} = process.env;
 
 const mainRouter = new Router();
 const api = getAPI();
 const cookieOptions = {
   httpOnly: true,
   sameSite: true,
-  maxAge: 1000 * 60 * 60 * 24,
+  maxAge: JWT_COOKIE_MAXAGE,
 };
 
 mainRouter.get(`/`, getUserAuth, async (req, res) => {
@@ -22,16 +29,33 @@ mainRouter.get(`/`, getUserAuth, async (req, res) => {
   page = +page;
 
   const limit = OFFERS_PER_PAGE;
+  const maxAnnounceLength = MAX_ANNOUNCE_LENGTH;
+  const maxCommentLength = MAX_COMMENT_LENGTH;
 
   const offset = (page - 1) * OFFERS_PER_PAGE;
-  const [{count, articles}, categories] = await Promise.all([
-    api.getArticles({limit, offset}),
-    api.getCategories({count: true}),
-  ]);
+  const [{count, articles}, categories, mostCommentedAtricles, latestComments] =
+    await Promise.all([
+      api.getArticles({limit, offset}),
+      api.getCategories({count: true}),
+      api.getMostCommentedArticles({limit: MOST_COMMENTED_ARTICLES_COUNT}),
+      api.getLatestComments({limit: LATEST_COMMENTS_COUNT}),
+    ]);
 
   const totalPages = Math.ceil(count / OFFERS_PER_PAGE);
+  const withPagination = totalPages > 1;
 
-  res.render(`main`, {articles, page, totalPages, categories, user});
+  return res.render(`main`, {
+    articles,
+    mostCommentedAtricles,
+    latestComments,
+    maxAnnounceLength,
+    maxCommentLength,
+    page,
+    totalPages,
+    withPagination,
+    categories,
+    user,
+  });
 });
 
 mainRouter.get(`/register`, getUserAuth, async (req, res) => {
@@ -57,28 +81,29 @@ mainRouter.post(`/register`, upload.single(`upload`), async (req, res) => {
 
   try {
     await api.createUser(userData);
-    res.redirect(`/login`);
+    return res.redirect(`/login`);
   } catch (errors) {
     const validationMessages = errors.response.data;
-    res.render(`sign-up`, {validationMessages});
+    return res.render(`sign-up`, {validationMessages, userData});
   }
 });
 
 mainRouter.get(`/login`, (req, res) => res.render(`login`));
 mainRouter.post(`/login`, async (req, res) => {
+  const {email, password} = req.body;
   try {
     const {accessToken, refreshToken} = await api.auth(
-        req.body.email,
-        req.body.password,
+        email,
+        password,
     );
     res.cookie(`accessToken`, accessToken, cookieOptions);
     res.cookie(`refreshToken`, refreshToken, cookieOptions);
 
-    res.redirect(`/`);
+    return res.redirect(`/`);
   } catch (errors) {
     const validationMessages = [errors.response.data];
 
-    res.render(`login`, {validationMessages});
+    return res.render(`login`, {validationMessages, email});
   }
 });
 
@@ -92,7 +117,7 @@ mainRouter.get(`/logout`, async (req, res) => {
   } finally {
     res.clearCookie(`accessToken`);
     res.clearCookie(`refreshToken`);
-    res.redirect(`/`);
+    return res.redirect(`/`);
   }
 });
 
@@ -123,7 +148,7 @@ mainRouter.get(`/search`, getUserAuth, async (req, res) => {
     });
   }
 });
-mainRouter.get(`/categories`, getUserAuth, (req, res) => res.render(`all-categories`));
+
 mainRouter.get(`/post-detail`, getUserAuth, (req, res) => res.render(`post-detail`));
 
 module.exports = mainRouter;

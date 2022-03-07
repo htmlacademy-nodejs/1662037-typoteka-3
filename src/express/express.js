@@ -25,9 +25,10 @@ app.use(
       contentSecurityPolicy: {
         directives: {
           // eslint-disable-next-line quotes
-          scriptSrc: ["'self'"],
+          scriptSrc: ["'self'", "'unsafe-eval'"],
         },
       },
+      referrerPolicy: {policy: `same-origin`},
       xssFilter: true,
     }),
 );
@@ -40,9 +41,9 @@ app.use(`/articles`, articlesRoutes);
 
 app.use((req, res) => res.status(HttpCode.NOT_FOUND).render(`errors/404`));
 
-// app.use((err, _req, res, _next) => {
-//   res.status(HttpCode.INTERNAL_SERVER_ERROR).render(`errors/500`);
-// });
+app.use((err, _req, res, _next) => {
+  res.status(HttpCode.INTERNAL_SERVER_ERROR).render(`errors/500`);
+});
 
 app.set(`views`, path.resolve(__dirname, `templates`));
 app.set(`view engine`, `pug`);

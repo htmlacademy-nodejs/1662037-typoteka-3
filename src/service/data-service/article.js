@@ -1,12 +1,14 @@
 'use strict';
 
 const Alias = require(`../models/alias`);
+const {Sequelize} = require(`sequelize`);
 
 class ArticlesService {
   constructor(sequelize) {
     this._Article = sequelize.models.Article;
     this._User = sequelize.models.User;
     this._Comment = sequelize.models.Comment;
+    this._ArticleCategory = sequelize.models.ArticleCategory;
   }
 
   async findAll(areCommentsNeeded) {
@@ -40,14 +42,58 @@ class ArticlesService {
     return articles.map((article) => article.get());
   }
 
-  async findPage({limit, offset}) {
-    const {count, rows} = await this._Article.findAndCountAll({
+  async findMostCommented(limit) {
+    const articles = await this._Article.findAll({
+      attributes: [
+        `id`,
+        `announce`,
+        [Sequelize.fn(`COUNT`, Sequelize.col(`comments.id`)), `commentsCount`],
+      ],
+      include: [
+        {
+          model: this._Comment,
+          as: Alias.COMMENTS,
+          attributes: [],
+        },
+      ],
+      group: [Sequelize.col(`Article.id`)],
+      order: [[Sequelize.col(`commentsCount`), `DESC`]],
+      having: Sequelize.where(
+          Sequelize.fn(`COUNT`, Sequelize.col(`comments.id`)),
+          {
+            [Sequelize.Op.gt]: 0,
+          },
+      ),
+      limit,
+      subQuery: false,
+    });
+
+    return articles.map((article) => article.get());
+  }
+
+  async findPage({limit, offset, categoryId}) {
+    const options = {
       limit,
       offset,
       include: [Alias.CATEGORIES, Alias.COMMENTS],
       order: [[`createdAt`, `DESC`]],
       distinct: true,
-    });
+
+    };
+
+    if (categoryId) {
+      options.include.push({
+        model: this._ArticleCategory,
+        as: Alias.ARTICLE_CATEGORIES,
+        attributes: [],
+        require: true,
+        where: {
+          categoryId,
+        },
+      });
+    }
+
+    const {count, rows} = await this._Article.findAndCountAll(options);
     return {count, articles: rows};
   }
 

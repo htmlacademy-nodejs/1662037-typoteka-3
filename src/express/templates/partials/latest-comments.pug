@@ -1,0 +1,15 @@
+section.main-page__last.last
+  h2.last__name
+    | Последние комментарии
+    span.last__icon.last__icon--cloud
+  if latestComments.length === 0
+    p.hot__empty
+      | Здесь пока ничего нет...
+  else
+    ul.last__list
+      each comment in latestComments
+        li.last__list-item
+          img.last__list-image(src=`/img/${comment.users.avatar ? comment.users.avatar : `/icons/smile.svg`}` width='20' height='20' alt='Аватар пользователя')
+          b.last__list-name #{comment.users.name} #{comment.users.surname}
+          a.last__list-link(href=`/articles/${comment.articleId}`) #{truncateText(comment.text, maxCommentLength)}
+

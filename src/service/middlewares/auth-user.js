@@ -28,6 +28,7 @@ module.exports = (userService) => async (req, res, next) => {
     surname: user.surname,
     email: user.email,
     avatar: user.avatar,
+    role: user.role,
   };
 
   return next();

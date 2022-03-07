@@ -39,9 +39,7 @@ const schema = Joi.object({
     .messages({
       'any.only': ErrorRegisterMessage.PASSWORD_REPEATED,
     }),
-  avatar: Joi.string().required().messages({
-    'string.empty': ErrorRegisterMessage.AVATAR,
-  }),
+  avatar: Joi.string().optional().allow(``),
 });
 
 module.exports = (service) => async (req, res, next) => {
@@ -59,7 +57,7 @@ module.exports = (service) => async (req, res, next) => {
   if (userByEmail) {
     return res
       .status(HttpCode.BAD_REQUEST)
-      .send(ErrorRegisterMessage.EMAIL_EXIST);
+      .send([ErrorRegisterMessage.EMAIL_EXIST]);
   }
 
   return next();

@@ -196,7 +196,6 @@ describe(`API refuses to create user if data is invalid`, () => {
     email: `sidorov@example.com`,
     password: `sidorov`,
     passwordRepeated: `sidorov`,
-    avatar: `sidorov.jpg`,
   };
 
   let app;

@@ -1,0 +1,11 @@
+h2.comments__title.title.title--middle Комментарии
+ul.comments__list
+  each comment in article.comments
+    li.comments__comment
+    .comments__avatar.avatar
+      img(src=`/img/${comment.users.avatar ? comment.users.avatar : `/icons/smile.svg`}` alt='аватар пользователя')
+    .comments__text
+      .comments__head
+        p #{comment.users.name} #{comment.users.surname} •
+        time.comments__date(datetime=comment.createdAt) #{moment(comment.createdAt).format('DD.MM.YYYY, HH:MM')}
+      p.comments__message #{comment.text}

@@ -15,7 +15,14 @@ class CategoryService {
         attributes: [
           `id`,
           `name`,
-          [Sequelize.fn(`COUNT`, `*`), `count`]],
+          [
+            Sequelize.fn(
+                `COUNT`,
+                Sequelize.col(`articleCategories.categoryId`),
+            ),
+            `count`,
+          ],
+        ],
         include: [
           {
             model: this._ArticleCategory,
@@ -23,12 +30,57 @@ class CategoryService {
             attributes: [],
           },
         ],
-        group: [Sequelize.col(`id`)],
+        having: Sequelize.where(
+            Sequelize.fn(`COUNT`, Sequelize.col(`articleCategories.categoryId`)),
+            {
+              [Sequelize.Op.gt]: 0,
+            },
+        ),
+        group: [Sequelize.col(`Category.id`)],
+        order: [[`name`, `ASC`]],
       });
+
       return result.map((item) => item.get());
     }
 
-    return await this._Category.findAll({raw: true});
+    return await this._Category.findAll({
+      raw: true,
+      order: [[`name`, `ASC`]],
+    });
+  }
+
+  async findOne(id) {
+    return await this._Category.findOne({
+      attributes: [`id`, `name`],
+      where: {id},
+      raw: true,
+    });
+  }
+
+  async findByName(name) {
+    const category = await this._Category.findOne({where: {name}});
+    return category && category.get();
+  }
+
+  async create(name) {
+    return await this._Category.create({name});
+  }
+
+  async update(id, name) {
+    const updatedRows = await this._Category.update({name}, {where: {id}});
+    return !!updatedRows;
+  }
+
+  async drop(id) {
+    const deletedRows = await this._Category.destroy({where: {id}});
+    return !!deletedRows;
+  }
+
+  async getArticlesByCategory(categoryId) {
+    return await this._ArticleCategory.findAll({
+      raw: true,
+      where: {categoryId},
+    });
   }
 }
 

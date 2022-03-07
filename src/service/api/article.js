@@ -12,16 +12,38 @@ module.exports = (app, articleService, commentService) => {
   app.use(`/articles`, router);
 
   router.get(`/`, async (req, res) => {
-    const {comments, limit, offset} = req.query;
+    const {comments, limit, offset, categoryId} = req.query;
     let result;
 
     if (limit || offset) {
-      result = await articleService.findPage({limit, offset});
+      result = await articleService.findPage({limit, offset, categoryId});
     } else {
       result = await articleService.findAll(comments);
     }
 
     return res.status(HttpCode.OK).json(result);
+  });
+
+  router.get(`/most_commented`, async (req, res) => {
+    const {limit} = req.query;
+    const articles = await articleService.findMostCommented(limit);
+
+    if (!articles) {
+      return res.send([]);
+    }
+
+    return res.status(HttpCode.OK).json(articles);
+  });
+
+  router.get(`/latest_comments`, async (req, res) => {
+    const {limit} = req.query;
+    const comments = await commentService.findLatest(limit);
+
+    if (!comments) {
+      return res.send([]);
+    }
+
+    return res.status(HttpCode.OK).json(comments);
   });
 
   router.get(
@@ -63,7 +85,7 @@ module.exports = (app, articleService, commentService) => {
 
         return res
         .status(HttpCode.OK)
-        .json(`Article with id ${articleId} has been updated`);
+        .send(`Article with id ${articleId} has been updated`);
       },
   );
 
@@ -79,13 +101,11 @@ module.exports = (app, articleService, commentService) => {
 
         if (!isDeleted) {
           return res
-          .status(HttpCode.BAD_REQUEST)
-          .send(`Article hasn't been deleted`);
+          .sendStatus(HttpCode.BAD_REQUEST);
         }
 
         return res
-        .status(HttpCode.OK)
-        .json(`Article with id ${articleId} has been deleted`);
+        .sendStatus(HttpCode.OK);
       },
   );
 
@@ -116,14 +136,10 @@ module.exports = (app, articleService, commentService) => {
         const isDeleted = await commentService.drop(commentId);
 
         if (!isDeleted) {
-          return res
-          .status(HttpCode.NOT_FOUND)
-          .send(`Comment with id ${commentId} not found`);
+          return res.sendStatus(HttpCode.NOT_FOUND);
         }
 
-        return res
-        .status(HttpCode.OK)
-        .json(`Comment with id ${commentId} has been deleted`);
+        return res.sendStatus(HttpCode.OK);
       },
   );
 

@@ -40,8 +40,8 @@ module.exports = {
     app.use(API_PREFIX, apiRouter);
 
     app.use((req, res) => {
-      res.status(HttpCode.NOT_FOUND).send(`Not found`);
       logger.error(`Route not found: ${req.url}`);
+      return res.status(HttpCode.NOT_FOUND).send(`Not found`);
     });
 
     app.use((err, _req, _res, _next) => {
