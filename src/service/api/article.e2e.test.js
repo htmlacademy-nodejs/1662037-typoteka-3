@@ -414,6 +414,19 @@ test(`API refuses to create a comment with empty text field`, async () => {
     .expect(HttpCode.BAD_REQUEST);
 });
 
+describe(`API deletes a comment`, () => {
+  let response;
+
+  beforeAll(async () => {
+    const app = await createAPI();
+    response = await request(app).delete(`/articles/3/comments/1`);
+  });
+
+  test(`Status code is 200`, () =>
+    expect(response.statusCode).toBe(HttpCode.OK));
+
+});
+
 test(`API refuses to delete non-existent comment`, async () => {
   const app = await createAPI();
 

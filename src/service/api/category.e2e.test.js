@@ -10,7 +10,6 @@ const DataService = require(`../data-service/category`);
 const {HttpCode, UserRole} = require(`../../const`);
 const passwordUtils = require(`../lib/password`);
 
-
 const mockCategories = [`Животные`, `Журналы`, `Игры`, `IT`];
 
 const mockArticles = [
@@ -160,7 +159,11 @@ app.use(express.json());
 const mockDB = new Sequelize(`sqlite::memory:`, {logging: false});
 
 beforeAll(async () => {
-  await initDB(mockDB, {categories: mockCategories, articles: mockArticles, users: mockUsers});
+  await initDB(mockDB, {
+    categories: mockCategories,
+    articles: mockArticles,
+    users: mockUsers,
+  });
   category(app, new DataService(mockDB));
 });
 
@@ -173,11 +176,157 @@ describe(`API returns category list`, () => {
 
   test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
 
-  test(`Returns list of 4 categories`, () => expect(response.body.length).toBe(4));
+  test(`Returns list of 4 categories`, () =>
+    expect(response.body.length).toBe(4));
 
   test(`Categories are Животные, Журналы, Игры, IT`, () =>
     expect(response.body.map((item) => item.name)).toEqual(
         expect.arrayContaining([`Животные`, `Журналы`, `Игры`, `IT`]),
     ));
+});
 
+describe(`API creates a category`, () => {
+  const newCategory = {
+    name: `Книги`,
+  };
+
+  let response;
+
+  beforeAll(async () => {
+    response = await request(app).post(`/categories/add`).send(newCategory);
+  });
+
+  test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
+
+  test(`Returns list of 5 categories`, async () =>
+    await request(app)
+      .get(`/categories`)
+      .then((res) => expect(res.body.length).toBe(5)));
+
+  test(`Categories includes new category`, async () =>
+    await request(app)
+      .get(`/categories`)
+      .then((res) => expect(res.body.includes(`Книги`))));
+});
+
+describe(`API doesn't create a category`, () => {
+  const shortNameCategory = {
+    name: `К`,
+  };
+
+  const longNameCategory = {
+    name: `Самый лучший музыкальный альбом этого года`,
+  };
+
+  const noNameCategory = {
+    someField: `Самый лучший`,
+  };
+
+  test(`When name is too short`, async () =>
+    await request(app)
+      .post(`/categories/add`)
+      .send(shortNameCategory)
+      .expect(HttpCode.BAD_REQUEST));
+
+  test(`When name is too long`, async () =>
+    await request(app)
+      .post(`/categories/add`)
+      .send(longNameCategory)
+      .expect(HttpCode.BAD_REQUEST));
+
+  test(`When there is no name field`, async () =>
+    await request(app)
+      .post(`/categories/add`)
+      .send(noNameCategory)
+      .expect(HttpCode.BAD_REQUEST));
+});
+
+describe(`API deletes a category`, () => {
+  let response;
+
+  beforeAll(async () => {
+    response = await request(app).delete(`/categories/5`);
+  });
+
+  test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
+
+  test(`Returns list of 4 categories`, async () =>
+    await request(app)
+      .get(`/categories`)
+      .then((res) => expect(res.body.length).toBe(4)));
+
+  test(`Categories doesn't include deleted category`, async () =>
+    await request(app)
+      .get(`/categories`)
+      .then((res) => expect(res.body.includes(`Животные`)).toBe(false)));
+});
+
+test(`Api refuses delete a non-existant category`, async () =>
+  await request(app).delete(`/categories/100`).expect(HttpCode.NOT_FOUND));
+
+test(`Api refuses delete a category when it contains articles`, async () =>
+  await request(app)
+    .delete(`/categories/1`)
+    .expect(HttpCode.BAD_REQUEST));
+
+describe(`API updates a category`, () => {
+  let response;
+  const newCategory = {
+    name: `Животные и насекомые`,
+  };
+
+  beforeAll(async () => {
+    response = await request(app).put(`/categories/1`).send(newCategory);
+  });
+
+  test(`Status code 200`, () =>
+    expect(response.statusCode).toBe(HttpCode.OK));
+
+  test(`Name of the category is really changed`, async () =>
+    await request(app)
+      .get(`/categories`)
+      .then((res) =>
+        expect(res.body.includes(`Животные и насекомые`)),
+      ));
+});
+
+test(`Api refuses update a non-existant category`, async () => {
+  const newCategory = {
+    name: `Животные и насекомые`,
+  };
+
+  return await request(app).put(`/categories/100`).send(newCategory).
+    expect(HttpCode.NOT_FOUND);
+});
+
+describe(`API doesn't update a category`, () => {
+  const shortNameCategory = {
+    name: `К`,
+  };
+
+  const longNameCategory = {
+    name: `Самый лучший музыкальный альбом этого года`,
+  };
+
+  const noNameCategory = {
+    someField: `Самый лучший`,
+  };
+
+  test(`When name is too short`, async () =>
+    await request(app)
+      .put(`/categories/1`)
+      .send(shortNameCategory)
+      .expect(HttpCode.BAD_REQUEST));
+
+  test(`When name is too long`, async () =>
+    await request(app)
+      .put(`/categories/1`)
+      .send(longNameCategory)
+      .expect(HttpCode.BAD_REQUEST));
+
+  test(`When there is no name field`, async () =>
+    await request(app)
+      .put(`/categories/1`)
+      .send(noNameCategory)
+      .expect(HttpCode.BAD_REQUEST));
 });
