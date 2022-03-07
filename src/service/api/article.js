@@ -22,6 +22,10 @@ module.exports = (app, articleService, commentService) => {
       articleService.findMostCommented(MOST_COMMENTED_ARTICLES_COUNT),
     ]);
 
+    if (!latestComments || !latestArticles) {
+      return;
+    }
+
     const io = req.app.locals.socketio;
 
     io.emit(`updateHotSection`, {latestComments, latestArticles});
