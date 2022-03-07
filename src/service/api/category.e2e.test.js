@@ -168,7 +168,7 @@ describe(`API returns category list`, () => {
   let response;
 
   beforeAll(async () => {
-    response = await request(app).get(`/category`);
+    response = await request(app).get(`/categories`);
   });
 
   test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));

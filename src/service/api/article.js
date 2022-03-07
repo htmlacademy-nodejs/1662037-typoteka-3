@@ -101,11 +101,11 @@ module.exports = (app, articleService, commentService) => {
 
         if (!isDeleted) {
           return res
-          .status(HttpCode.BAD_REQUEST);
+          .sendStatus(HttpCode.BAD_REQUEST);
         }
 
         return res
-        .status(HttpCode.OK);
+        .sendStatus(HttpCode.OK);
       },
   );
 
