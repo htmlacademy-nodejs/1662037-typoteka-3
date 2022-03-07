@@ -3,6 +3,9 @@
 const express = require(`express`);
 const {getLogger} = require(`../lib/logger`);
 const sequelize = require(`../lib/sequelize`);
+const http = require(`http`);
+const socketio = require(`../lib/socket`);
+
 const {HttpCode} = require(`../../const`);
 const apiRouter = require(`../api`);
 
@@ -23,6 +26,16 @@ module.exports = {
     logger.info(`Connection to database established`);
 
     const app = express();
+    const server = http.createServer(app);
+
+    const io = socketio(server);
+
+    io.on(`connection`, (socket) => {
+      const {address: ip} = socket.handshake;
+      console.log(`Новое подключение: ${ip}`);
+    });
+
+    app.locals.socketio = io;
 
     const [customPort] = args;
     const port = Number.parseInt(customPort, 10) || DEFAULT_PORT;
@@ -49,7 +62,7 @@ module.exports = {
     });
 
     try {
-      app.listen(port, (err) => {
+      server.listen(port, (err) => {
         if (err) {
           return logger.error(
               `An error occurred on server creation: ${err.message}`,

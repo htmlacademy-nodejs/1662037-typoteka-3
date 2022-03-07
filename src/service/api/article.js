@@ -7,8 +7,26 @@ const checkArticleExistance = require(`../middlewares/check-article-existance`);
 const validateComment = require(`../middlewares/validate-comment`);
 const validateRouteParams = require(`../middlewares/route-params-validator`);
 
+const {
+  MOST_COMMENTED_ARTICLES_COUNT,
+  LATEST_COMMENTS_COUNT,
+} = process.env;
+
+
 module.exports = (app, articleService, commentService) => {
   const router = new Router();
+
+  const updateHotSectionData = async (req) => {
+    const [latestComments, latestArticles] = await Promise.all([
+      commentService.findLatest(LATEST_COMMENTS_COUNT),
+      articleService.findMostCommented(MOST_COMMENTED_ARTICLES_COUNT),
+    ]);
+
+    const io = req.app.locals.socketio;
+
+    io.emit(`updateHotSection`, {latestComments, latestArticles});
+  };
+
   app.use(`/articles`, router);
 
   router.get(`/`, async (req, res) => {
@@ -104,6 +122,8 @@ module.exports = (app, articleService, commentService) => {
           .sendStatus(HttpCode.BAD_REQUEST);
         }
 
+        await updateHotSectionData(req);
+
         return res
         .sendStatus(HttpCode.OK);
       },
@@ -139,6 +159,8 @@ module.exports = (app, articleService, commentService) => {
           return res.sendStatus(HttpCode.NOT_FOUND);
         }
 
+        await updateHotSectionData(req);
+
         return res.sendStatus(HttpCode.OK);
       },
   );
@@ -152,7 +174,10 @@ module.exports = (app, articleService, commentService) => {
       async (req, res) => {
         const {articleId} = req.params;
         const commentData = req.body;
+
         const newComment = await commentService.create(articleId, commentData);
+
+        await updateHotSectionData(req);
 
         return res.status(HttpCode.CREATED).json(newComment);
       },
