@@ -222,6 +222,10 @@ describe(`API doesn't create a category`, () => {
     someField: `Самый лучший`,
   };
 
+  const alreadyExistantCategory = {
+    name: `Журналы`,
+  };
+
   test(`When name is too short`, async () =>
     await request(app)
       .post(`/categories/add`)
@@ -238,6 +242,12 @@ describe(`API doesn't create a category`, () => {
     await request(app)
       .post(`/categories/add`)
       .send(noNameCategory)
+      .expect(HttpCode.BAD_REQUEST));
+
+  test(`When category already exists`, async () =>
+    await request(app)
+      .post(`/categories/add`)
+      .send(alreadyExistantCategory)
       .expect(HttpCode.BAD_REQUEST));
 });
 
@@ -312,6 +322,10 @@ describe(`API doesn't update a category`, () => {
     someField: `Самый лучший`,
   };
 
+  const alreadyExistantCategory = {
+    name: `Журналы`,
+  };
+
   test(`When name is too short`, async () =>
     await request(app)
       .put(`/categories/1`)
@@ -328,5 +342,11 @@ describe(`API doesn't update a category`, () => {
     await request(app)
       .put(`/categories/1`)
       .send(noNameCategory)
+      .expect(HttpCode.BAD_REQUEST));
+
+  test(`When category already exists`, async () =>
+    await request(app)
+      .put(`/categories/1`)
+      .send(alreadyExistantCategory)
       .expect(HttpCode.BAD_REQUEST));
 });

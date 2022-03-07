@@ -25,7 +25,7 @@ module.exports = (app, service) => {
     return res.status(HttpCode.OK).json(category);
   });
 
-  router.post(`/add`, validateCategoryName, async (req, res) => {
+  router.post(`/add`, validateCategoryName(service), async (req, res) => {
     const {name} = req.body;
 
     const category = await service.create(name);
@@ -52,7 +52,7 @@ module.exports = (app, service) => {
   router.put(
       `/:id`,
       checkCategoryExistance(service),
-      validateCategoryName,
+      validateCategoryName(service),
       async (req, res) => {
         const {id} = req.params;
         const {name} = req.body;

@@ -57,15 +57,17 @@ class CategoryService {
     });
   }
 
+  async findByName(name) {
+    const category = await this._Category.findOne({where: {name}});
+    return category && category.get();
+  }
+
   async create(name) {
     return await this._Category.create({name});
   }
 
   async update(id, name) {
-    const updatedRows = await this._Category.update(
-        {name},
-        {where: {id}},
-    );
+    const updatedRows = await this._Category.update({name}, {where: {id}});
     return !!updatedRows;
   }
 
