@@ -44,7 +44,7 @@ mainRouter.get(`/`, getUserAuth, async (req, res) => {
   const totalPages = Math.ceil(count / OFFERS_PER_PAGE);
   const withPagination = totalPages > 1;
 
-  res.render(`main`, {
+  return res.render(`main`, {
     articles,
     mostCommentedAtricles,
     latestComments,
@@ -81,10 +81,10 @@ mainRouter.post(`/register`, upload.single(`upload`), async (req, res) => {
 
   try {
     await api.createUser(userData);
-    res.redirect(`/login`);
+    return res.redirect(`/login`);
   } catch (errors) {
     const validationMessages = errors.response.data;
-    res.render(`sign-up`, {validationMessages, userData});
+    return res.render(`sign-up`, {validationMessages, userData});
   }
 });
 
@@ -99,11 +99,11 @@ mainRouter.post(`/login`, async (req, res) => {
     res.cookie(`accessToken`, accessToken, cookieOptions);
     res.cookie(`refreshToken`, refreshToken, cookieOptions);
 
-    res.redirect(`/`);
+    return res.redirect(`/`);
   } catch (errors) {
     const validationMessages = [errors.response.data];
 
-    res.render(`login`, {validationMessages, email});
+    return res.render(`login`, {validationMessages, email});
   }
 });
 
@@ -117,7 +117,7 @@ mainRouter.get(`/logout`, async (req, res) => {
   } finally {
     res.clearCookie(`accessToken`);
     res.clearCookie(`refreshToken`);
-    res.redirect(`/`);
+    return res.redirect(`/`);
   }
 });
 

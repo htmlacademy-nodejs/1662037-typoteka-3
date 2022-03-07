@@ -25,14 +25,14 @@ myRouter.get(
 
       const articles = await api.getArticles({comments: true});
       const comments = articles.flatMap((article) => article.comments);
-      res.render(`admin/comments`, {articles, comments, user});
+      return res.render(`admin/comments`, {articles, comments, user});
     },
 );
 
 myRouter.get(`/post`, getUserAuth, checkAuth, checkAdmin, (req, res) => {
   const {user} = res.locals;
 
-  res.render(`admin/post`, {user});
+  return res.render(`admin/post`, {user});
 });
 
 myRouter.get(
@@ -42,7 +42,7 @@ myRouter.get(
     checkAdmin,
     async (req, res) => {
       const categories = await api.getCategories();
-      res.render(`admin/all-categories`, {categories});
+      return res.render(`admin/all-categories`, {categories});
     },
 );
 
@@ -56,11 +56,14 @@ myRouter.post(
 
       try {
         await api.createCategory(name);
-        res.redirect(`/my/categories`);
+        return res.redirect(`/my/categories`);
       } catch (errors) {
         const validationMessages = errors.response.data;
         const categories = await api.getCategories();
-        res.render(`admin/all-categories`, {categories, validationMessages});
+        return res.render(`admin/all-categories`, {
+          categories,
+          validationMessages,
+        });
       }
     },
 );
@@ -76,10 +79,13 @@ myRouter.post(
 
       try {
         await api.deleteCategory(id);
-        res.redirect(`/my/categories`);
+        return res.redirect(`/my/categories`);
       } catch (errors) {
         const validationMessages = [errors.response.data];
-        res.render(`admin/all-categories`, {categories, validationMessages});
+        return res.render(`admin/all-categories`, {
+          categories,
+          validationMessages,
+        });
       }
     },
 );
@@ -96,10 +102,13 @@ myRouter.post(
 
       try {
         await api.updateCategory(id, name);
-        res.redirect(`/my/categories`);
+        return res.redirect(`/my/categories`);
       } catch (errors) {
         const validationMessages = errors.response.data;
-        res.render(`admin/all-categories`, {categories, validationMessages});
+        return res.render(`admin/all-categories`, {
+          categories,
+          validationMessages,
+        });
       }
     },
 );
