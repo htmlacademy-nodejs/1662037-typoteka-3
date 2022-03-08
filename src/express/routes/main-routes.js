@@ -3,6 +3,7 @@
 
 const {Router} = require(`express`);
 const {getAPI} = require(`../api`);
+const {prepareErrors} = require(`../lib/utils`);
 const upload = require(`../middlewares/upload`);
 const getUserAuth = require(`../middlewares/get-user-auth`);
 
@@ -83,7 +84,7 @@ mainRouter.post(`/register`, upload.single(`upload`), async (req, res) => {
     await api.createUser(userData);
     return res.redirect(`/login`);
   } catch (errors) {
-    const validationMessages = errors.response.data;
+    const validationMessages = prepareErrors(errors);
     return res.render(`sign-up`, {validationMessages, userData});
   }
 });
@@ -101,7 +102,7 @@ mainRouter.post(`/login`, async (req, res) => {
 
     return res.redirect(`/`);
   } catch (errors) {
-    const validationMessages = [errors.response.data];
+    const validationMessages = prepareErrors(errors);
 
     return res.render(`login`, {validationMessages, email});
   }

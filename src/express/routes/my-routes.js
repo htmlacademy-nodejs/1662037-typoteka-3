@@ -2,6 +2,7 @@
 
 const {Router} = require(`express`);
 const {getAPI} = require(`../api`);
+const {prepareErrors} = require(`../lib/utils`);
 const checkAuth = require(`../middlewares/check-auth`);
 const getUserAuth = require(`../middlewares/get-user-auth`);
 const checkAdmin = require(`../middlewares/check-admin`);
@@ -58,7 +59,7 @@ myRouter.post(
         await api.createCategory(name);
         return res.redirect(`/my/categories`);
       } catch (errors) {
-        const validationMessages = errors.response.data;
+        const validationMessages = prepareErrors(errors);
         const categories = await api.getCategories();
         return res.render(`admin/all-categories`, {
           categories,
@@ -81,7 +82,7 @@ myRouter.post(
         await api.deleteCategory(id);
         return res.redirect(`/my/categories`);
       } catch (errors) {
-        const validationMessages = [errors.response.data];
+        const validationMessages = prepareErrors(errors);
         return res.render(`admin/all-categories`, {
           categories,
           validationMessages,
