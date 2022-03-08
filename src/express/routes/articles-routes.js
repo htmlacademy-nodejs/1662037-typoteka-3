@@ -3,6 +3,7 @@
 const {Router} = require(`express`);
 const csrf = require(`csurf`);
 const upload = require(`../middlewares/upload`);
+const {prepareErrors} = require(`../lib/utils`);
 const checkAuth = require(`../middlewares/check-auth`);
 const getUserAuth = require(`../middlewares/get-user-auth`);
 const checkAdmin = require(`../middlewares/check-admin`);
@@ -58,7 +59,7 @@ articlesRouter.post(
         return res.redirect(`/my`);
       } catch (errors) {
         const categories = await api.getCategories();
-        const validationMessages = errors.response.data;
+        const validationMessages = prepareErrors(errors);
 
         return res.render(`post-add-edit`, {
           article: articleData,
@@ -115,8 +116,7 @@ articlesRouter.post(
         return res.redirect(`/articles/${id}`);
       } catch (errors) {
         const categories = await api.getCategories();
-        const validationMessages = errors.response.data;
-
+        const validationMessages = prepareErrors(errors);
         return res.render(`post-add-edit`, {
           article: articleData,
           categories,
@@ -196,7 +196,7 @@ articlesRouter.post(
         await api.createComment(id, {text: comment, userId: user.id});
         return res.redirect(`/articles/${id}`);
       } catch (errors) {
-        const validationMessages = errors.response.data;
+        const validationMessages = prepareErrors(errors);
         const article = await api.getArticle(id);
         return res.render(`post-detail`, {
           article,
