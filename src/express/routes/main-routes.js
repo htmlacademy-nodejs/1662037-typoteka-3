@@ -34,7 +34,7 @@ mainRouter.get(`/`, getUserAuth, async (req, res) => {
   const maxCommentLength = MAX_COMMENT_LENGTH;
 
   const offset = (page - 1) * OFFERS_PER_PAGE;
-  const [{count, articles}, categories, mostCommentedAtricles, latestComments] =
+  const [{count, articles}, categories, mostCommentedArticles, latestComments] =
     await Promise.all([
       api.getArticles({limit, offset}),
       api.getCategories({count: true}),
@@ -47,7 +47,7 @@ mainRouter.get(`/`, getUserAuth, async (req, res) => {
 
   return res.render(`main`, {
     articles,
-    mostCommentedAtricles,
+    mostCommentedArticles,
     latestComments,
     maxAnnounceLength,
     maxCommentLength,

@@ -3,5 +3,5 @@
 module.exports.prepareErrors = (errors) => {
   const errorsMessages = errors.response.data;
 
-  return typeof errorsMessages === Array ? errorsMessages : [errorsMessages];
+  return Array.isArray(errorsMessages) ? errorsMessages : [errorsMessages];
 };

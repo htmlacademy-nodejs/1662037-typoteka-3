@@ -37,11 +37,9 @@ module.exports = (app, articleService, commentService) => {
     const {comments, limit, offset, categoryId} = req.query;
     let result;
 
-    if (limit || offset) {
-      result = await articleService.findPage({limit, offset, categoryId});
-    } else {
-      result = await articleService.findAll(comments);
-    }
+    result = limit || offset
+      ? await articleService.findPage({limit, offset, categoryId})
+      : await articleService.findAll(comments);
 
     return res.status(HttpCode.OK).json(result);
   });
