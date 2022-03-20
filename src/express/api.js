@@ -17,15 +17,14 @@ class API {
     });
   }
 
-  async _load(url, options) {
-    const response = await this._http.request({url, ...options});
-    return response.data;
-  }
-
   getArticles({comments, offset, limit, categoryId} = {}) {
     return this._load(`/articles`, {
       params: {comments, offset, limit, categoryId},
     });
+  }
+
+  getArticle(id) {
+    return this._load(`/articles/${id}`);
   }
 
   getMostCommentedArticles({limit} = {}) {
@@ -36,20 +35,16 @@ class API {
     return this._load(`/articles/latest_comments`, {params: {limit}});
   }
 
-  getArticle(id) {
-    return this._load(`/articles/${id}`);
-  }
-
-  search(query) {
-    return this._load(`/search`, {params: {query}});
-  }
-
   async getCategories({count} = {}) {
     return this._load(`/categories`, {params: {count}});
   }
 
   async getCategory({id}) {
     return this._load(`/categories/${id}`);
+  }
+
+  search(query) {
+    return this._load(`/search`, {params: {query}});
   }
 
   async createArticle(data) {
@@ -138,6 +133,11 @@ class API {
     return this._load(`/categories/${id}`, {
       method: HttpMethod.DELETE,
     });
+  }
+
+  async _load(url, options) {
+    const response = await this._http.request({url, ...options});
+    return response.data;
   }
 }
 

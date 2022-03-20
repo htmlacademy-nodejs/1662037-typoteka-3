@@ -17,8 +17,7 @@ const define = (sequelize) =>
           allowNull: false,
         },
         fullText: {
-          //  eslint-disable-next-line new-cap
-          type: DataTypes.STRING(1000),
+          type: DataTypes.TEXT,
           allowNull: false,
         },
       },

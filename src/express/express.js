@@ -26,8 +26,7 @@ app.use(
         directives: {
           'default-src':
             helmet.contentSecurityPolicy.dangerouslyDisableDefaultSrc,
-          // eslint-disable-next-line quotes
-          'scriptSrc': ["cdn.socket.io", "'self'", "'unsafe-eval'"],
+          'scriptSrc': [`cdn.socket.io`, `'self'`, `'unsafe-eval'`],
         },
       },
       referrerPolicy: {policy: `same-origin`},
