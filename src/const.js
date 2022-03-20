@@ -4,12 +4,12 @@ const DEFAULT_COMMAND = `--help`;
 
 const USER_ARGV_INDEX = 2;
 
+const MAX_ID_LENGTH = 6;
+
 const ExitCode = {
   success: 0,
   error: 1,
 };
-
-const MAX_ID_LENGTH = 6;
 
 const HttpCode = {
   OK: 200,

@@ -10,3 +10,8 @@ extends: 'htmlacademy/node'
 
 ignorePatterns:
   '**/express/public/**/*.js'
+
+rules:
+  no-empty: ["error", {
+    allowEmptyCatch: true
+}]

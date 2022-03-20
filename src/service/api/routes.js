@@ -2,12 +2,12 @@
 
 const {Router} = require(`express`);
 const {CategoryService, ArticlesService, SearchService, CommentService, UserService, RefreshTokenService} = require(`../data-service`);
-const defineModels = require(`../models`);
+const defineModels = require(`../models/define`);
 const sequelize = require(`../lib/sequelize`);
-const registerCategoryRoutes = require(`./category`);
-const registerArticlesRoutes = require(`./article`);
-const registerSearchService = require(`./search`);
-const registerUserRoutes = require(`./user`);
+const registerCategoryRoutes = require(`./category/category`);
+const registerArticlesRoutes = require(`./article/article`);
+const registerSearchService = require(`./search/search`);
+const registerUserRoutes = require(`./user/user`);
 
 const apiRouter = new Router();
 

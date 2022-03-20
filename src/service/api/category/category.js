@@ -1,10 +1,10 @@
 'use strict';
 
 const {Router} = require(`express`);
-const {HttpCode} = require(`../../const`);
-const validateCategoryName = require(`../middlewares/validate-category-name`);
-const checkCategoryIsEmpty = require(`../middlewares/check-category-is-empty`);
-const checkCategoryExistance = require(`../middlewares/check-category-existance`);
+const {HttpCode} = require(`../../../const`);
+const validateCategoryName = require(`../../middlewares/validate-category-name`);
+const checkCategoryIsEmpty = require(`../../middlewares/check-category-is-empty`);
+const checkCategoryExistence = require(`../../middlewares/check-category-existence`);
 
 
 module.exports = (app, service) => {
@@ -34,7 +34,7 @@ module.exports = (app, service) => {
 
   router.delete(
       `/:id`,
-      checkCategoryExistance(service),
+      checkCategoryExistence(service),
       checkCategoryIsEmpty(service),
       async (req, res) => {
         const {id} = req.params;
@@ -51,7 +51,7 @@ module.exports = (app, service) => {
 
   router.put(
       `/:id`,
-      checkCategoryExistance(service),
+      checkCategoryExistence(service),
       validateCategoryName(service),
       async (req, res) => {
         const {id} = req.params;

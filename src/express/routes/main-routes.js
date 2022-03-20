@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 'use strict';
 
 const {Router} = require(`express`);
@@ -113,7 +112,6 @@ mainRouter.get(`/logout`, async (req, res) => {
 
   try {
     await api.logout(refreshToken);
-  // eslint-disable-next-line no-empty
   } catch (_err) {
   } finally {
     res.clearCookie(`accessToken`);
