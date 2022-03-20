@@ -5,14 +5,11 @@ const help = require(`./help`);
 const filldb = require(`./filldb`);
 const server = require(`./server`);
 
-const Cli = {
+
+module.exports = () => ({
   [version.name]: version,
   [help.name]: help,
   [filldb.name]: filldb,
   [server.name]: server,
-};
-
-module.exports = {
-  Cli,
-};
+});
 

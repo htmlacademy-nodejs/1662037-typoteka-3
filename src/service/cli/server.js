@@ -7,7 +7,7 @@ const http = require(`http`);
 const socketio = require(`../lib/socket`);
 
 const {HttpCode} = require(`../../const`);
-const apiRouter = require(`../api`);
+const apiRouter = require(`../api/routes`);
 
 const DEFAULT_PORT = 3000;
 const API_PREFIX = `/api`;

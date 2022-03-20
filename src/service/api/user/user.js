@@ -1,11 +1,11 @@
 'use strict';
 
 const {Router} = require(`express`);
-const {HttpCode, UserRole} = require(`../../const`);
-const validateUser = require(`../middlewares/validate-user`);
-const authUser = require(`../middlewares/auth-user`);
-const {makeTokens, verifyRefreshToken} = require(`../lib/jwt-helper`);
-const {hash} = require(`../lib/password`);
+const {HttpCode, UserRole} = require(`../../../const`);
+const validateUser = require(`../../middlewares/validate-user`);
+const authUser = require(`../../middlewares/auth-user`);
+const {makeTokens, verifyRefreshToken} = require(`../../lib/jwt-helper`);
+const {hash} = require(`../../lib/password`);
 
 module.exports = (app, userService, refreshTokenService) => {
   const router = new Router();

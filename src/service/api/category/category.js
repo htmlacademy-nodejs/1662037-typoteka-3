@@ -1,10 +1,10 @@
 'use strict';
 
 const {Router} = require(`express`);
-const {HttpCode} = require(`../../const`);
-const validateCategoryName = require(`../middlewares/validate-category-name`);
-const checkCategoryIsEmpty = require(`../middlewares/check-category-is-empty`);
-const checkCategoryExistance = require(`../middlewares/check-category-existance`);
+const {HttpCode} = require(`../../../const`);
+const validateCategoryName = require(`../../middlewares/validate-category-name`);
+const checkCategoryIsEmpty = require(`../../middlewares/check-category-is-empty`);
+const checkCategoryExistance = require(`../../middlewares/check-category-existance`);
 
 
 module.exports = (app, service) => {

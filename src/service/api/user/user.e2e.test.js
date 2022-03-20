@@ -4,12 +4,12 @@ const express = require(`express`);
 const request = require(`supertest`);
 const Sequelize = require(`sequelize`);
 
-const initDB = require(`../lib/init-db`);
+const initDB = require(`../../lib/init-db`);
 const user = require(`./user`);
-const UserService = require(`../data-service/user`);
-const RefreshTokenService = require(`../data-service/refresh-token`);
-const passwordUtils = require(`../lib/password`);
-const {HttpCode, UserRole} = require(`../../const`);
+const UserService = require(`../../data-service/user`);
+const RefreshTokenService = require(`../../data-service/refresh-token`);
+const passwordUtils = require(`../../lib/password`);
+const {HttpCode, UserRole} = require(`../../../const`);
 
 const mockUsers = [
   {

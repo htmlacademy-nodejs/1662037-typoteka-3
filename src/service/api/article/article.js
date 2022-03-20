@@ -1,11 +1,11 @@
 'use strict';
 
 const {Router} = require(`express`);
-const {HttpCode} = require(`../../const`);
-const validateArticle = require(`../middlewares/validate-article`);
-const checkArticleExistance = require(`../middlewares/check-article-existance`);
-const validateComment = require(`../middlewares/validate-comment`);
-const validateRouteParams = require(`../middlewares/route-params-validator`);
+const {HttpCode} = require(`../../../const`);
+const validateArticle = require(`../../middlewares/validate-article`);
+const checkArticleExistance = require(`../../middlewares/check-article-existance`);
+const validateComment = require(`../../middlewares/validate-comment`);
+const validateRouteParams = require(`../../middlewares/route-params-validator`);
 
 const {
   MOST_COMMENTED_ARTICLES_COUNT,
@@ -28,7 +28,9 @@ module.exports = (app, articleService, commentService) => {
 
     const io = req.app.locals.socketio;
 
-    io.emit(`updateHotSection`, {latestComments, latestArticles});
+    if (io) {
+      io.emit(`updateHotSection`, {latestComments, latestArticles});
+    }
   };
 
   app.use(`/articles`, router);
